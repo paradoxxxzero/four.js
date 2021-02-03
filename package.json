@@ -1,15 +1,31 @@
 {
-  "name": "four.js",
+  "name": "four-js",
   "version": "0.1.0",
   "description": "Render 4 dimensional objects with three.js",
-  "main": "src/index.js",
+  "main": "build/four.js",
+  "module": "build/four.module.js",
   "repository": "https://github.com/paradoxxxzero/four.js",
+  "scripts": {
+    "build": "rollup -c",
+    "start": "yarn build && servez -p 44444"
+  },
+  "files": [
+    "build/four.js",
+    "build/four.module.js",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "src"
+  ],
   "author": "Florian Mounier",
   "license": "MIT",
   "peerDependencies": {
-    "three.js": "^0.77.1"
+    "three": "^0.X.X"
   },
   "devDependencies": {
-    "rollup": "^2.38.4"
+    "@rollup/plugin-node-resolve": "^11.1.1",
+    "rollup": "^2.38.4",
+    "servez": "^1.11.0",
+    "three": "^0.125.2"
   }
 }

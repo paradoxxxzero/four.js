@@ -12,7 +12,7 @@ export default class HyperMesh extends Group {
 
     this.add(
       ...this.hyperGeometry.geometries.map(
-        (geometry, i) => new MeshClass(geometry, materials[i])
+        (geometry, i) => new MeshClass(geometry, this.materials[i])
       )
     )
   }

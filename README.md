@@ -1,21 +1,25 @@
 # four.js
 
-An attemp to render 4 dimensional objects with three.js
+An attemp to render 4 dimensional objects with three.js.
+
+Full demo: [anakata](https://florian.mounier.dev/anakataGL/)
 
 ## Installation
 
-`npm --save install four.js`
-
-or
-
-`yarn add four.js`
+```bash
+yarn add four-js
+# or
+npm --save install four-js
+```
 
 ## Usage
+
+Full working example [here](https://github.com/paradoxxxzero/four.js/blob/master/examples/tesseract.html) (`git clone https://github.com/paradoxxxzero/four.js && cd four.js && yarn install && yarn start` and open http://localhost:44444/examples/tesseract.html)
 
 ### Creating
 
 ```js
-import { HyperGeometry, shapes } from 'four.js'
+import { HyperGeometry, shapes } from 'four-js'
 
 // Import tesseract preset shape
 const { tesseract } = shapes
@@ -32,14 +36,14 @@ const hyperGeometry = new HyperGeometry(
 )
 // Create a material as usual
 const material = new MeshLambertMaterial()
-material.opacity = 0.1
 material.transparent = true
+material.opacity = 0.1
 material.blending = AdditiveBlending
 material.side = DoubleSide
 material.depthWrite = false
-material.color = 0xdd22ff
+material.color = new Color(0x00ff99)
 
-// And the make the HyperMesh which is actually a three.js Group of cell Mesh
+// And them make an HyperMesh which is actually a three.js Group of cell Mesh
 // If you want different materials per cells, just replace material with
 // a material array with the same length as the number of cells
 const hyperMesh = new HyperMesh(hyperGeometry, material)
@@ -195,3 +199,5 @@ is composed of 4 vertices:
 ```
 
 Following that logic you can try to draw your own 4d models.
+
+Feel free to make pull requests with your own creations!

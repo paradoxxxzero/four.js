@@ -1,9 +1,9 @@
-import HyperEdgeGeometry from "./HyperEdgeGeometry";
-import HyperGeometry from "./HyperGeometry";
-import HyperMesh from "./HyperMesh";
-import HyperPointsGeometry from "./HyperPointsGeometry";
-import HyperRenderer from "./HyperRenderer";
-import shapes from "./shapes";
+import HyperEdgeGeometry from './HyperEdgeGeometry'
+import HyperGeometry from './HyperGeometry'
+import HyperMesh from './HyperMesh'
+import HyperPointsGeometry from './HyperPointsGeometry'
+import HyperRenderer from './HyperRenderer'
+import * as shapes from './shapes'
 
 export {
   HyperMesh,
@@ -11,5 +11,5 @@ export {
   HyperGeometry,
   HyperEdgeGeometry,
   HyperPointsGeometry,
-  shapes
-};
+  shapes,
+}
