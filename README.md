@@ -2,7 +2,7 @@
 
 An attemp to render 4 dimensional objects with three.js.
 
-Full demo: [anakata](https://florian.mounier.dev/anakataGL/)
+**Full demo: [anakata](https://florian.mounier.dev/anakataGL/)**
 
 ## Installation
 
@@ -14,9 +14,11 @@ npm --save install four-js
 
 ## Usage
 
-Full working example [here](https://github.com/paradoxxxzero/four.js/blob/master/examples/tesseract.html) (`git clone https://github.com/paradoxxxzero/four.js && cd four.js && yarn install && yarn start` and open http://localhost:44444/examples/tesseract.html)
+Full working example [here](https://github.com/paradoxxxzero/four.js/blob/master/examples/tesseract.html)
 
-### Creating
+To run it: `git clone https://github.com/paradoxxxzero/four.js && cd four.js && yarn install && yarn start` then open http://localhost:44444/examples/tesseract.html
+
+### Creating
 
 ```js
 import { HyperGeometry, shapes } from 'four-js'
@@ -84,6 +86,7 @@ const material = new LineBasicMaterial()
 const hyperEdges = new HyperMesh(hyperGeometry, material, LineSegments)
 ```
 
+or only the vertices with `HyperPointsGeometry`:
 ```js
 const hyperGeometry = new HyperPointsGeometry(
   tesseract.vertices,
@@ -98,7 +101,7 @@ const material = new PointsMaterial()
 const hyperEdges = new HyperMesh(hyperGeometry, material, Points)
 ```
 
-## Shape
+## Shape definition
 
 The 4 dimensional mesh descriptions are composed of vertices, faces and cells.
 
