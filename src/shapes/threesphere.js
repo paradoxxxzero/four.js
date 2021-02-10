@@ -12,7 +12,7 @@ function createSphere(radius, step=Math.PI/8) {
 
   for (let theta = 0; theta <=  Math.PI; theta += step) {
     for (let phi = 0; phi <=  Math.PI; phi += step) {
-      for (let gamma = 0; gamma < 2 * Math.PI; gamma += step) {
+      for (let gamma = 0; gamma <= 2 * Math.PI; gamma += step) {
         if (!classOfVertex.theta[theta]) {
           classOfVertex.theta[theta] = [];
         }
