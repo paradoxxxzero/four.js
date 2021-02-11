@@ -52,32 +52,26 @@ function init() {
   hyperRenderer = new FOUR.HyperRenderer(1.5, 5)
 
   // Declare an HyperGeometry (it will generate a BufferGeometry per cell)
-  const sphere = threesphere(2, Math.PI /8);
-  const hyperGeometry = new FOUR.HyperEdgeGeometry(
+  const sphere = threesphere(2, 8);
+  const hyperGeometry = new FOUR.HyperGeometry(
     sphere.vertices,
     sphere.faces,
     sphere.cells,
     hyperRenderer
   )
   // Create a material as usual
-  //const material = new THREE.MeshLambertMaterial()
-  //const material = new THREE.PointsMaterial()
-  /*material.transparent = true
-  material.opacity = 0.1
+  const material = new THREE.MeshLambertMaterial()
+  material.transparent = true
+  material.opacity = 0.03
   material.blending = THREE.AdditiveBlending
   material.side = THREE.DoubleSide
-  material.depthWrite = false*/
-  const material = new THREE.LineBasicMaterial();
-  material.color = new THREE.Color(0x00ff99);
-  material.linewidth = 1;
-  material.linecap = 'round';
-  material.linejoin = 'round';
-  material.opacity = 0;
+  material.depthWrite = false
+  material.color = new THREE.Color(0x00ff99)
 
   // And then make an HyperMesh which is actually a three.js Group of cell Mesh
   // If you want different materials per cells, just replace material with
   // a material array with the same length as the number of cells
-  hyperMesh = new FOUR.HyperMesh(hyperGeometry, material, THREE.LineSegments)
+  hyperMesh = new FOUR.HyperMesh(hyperGeometry, material)
   scene.add(hyperMesh)
   window.addEventListener('resize', onWindowResize)
 }
@@ -97,7 +91,7 @@ function animate() {
 
 function render() {
   // Rotate takes the rotation speed around the 6 planes:
-  hyperRenderer.rotate({ xy: 2, xz: 7, xw: 5, yz: 3, yw: 7, zw: 11 })
+  hyperRenderer.rotate({ xy: 0, xz: 0, xw: 5, yz: 0, yw: 10, zw: 10 })
   // Update the hyperMesh
   hyperMesh.update()
   
