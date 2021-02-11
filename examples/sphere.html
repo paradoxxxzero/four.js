@@ -52,7 +52,7 @@ function init() {
   hyperRenderer = new FOUR.HyperRenderer(1.5, 5)
 
   // Declare an HyperGeometry (it will generate a BufferGeometry per cell)
-  const sphere = threesphere(2, 8);
+  const sphere = threesphere;
   const hyperGeometry = new FOUR.HyperGeometry(
     sphere.vertices,
     sphere.faces,
