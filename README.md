@@ -87,6 +87,7 @@ const hyperEdges = new HyperMesh(hyperGeometry, material, LineSegments)
 ```
 
 or only the vertices with `HyperPointsGeometry`:
+
 ```js
 const hyperGeometry = new HyperPointsGeometry(
   tesseract.vertices,
@@ -204,3 +205,9 @@ is composed of 4 vertices:
 Following that logic you can try to draw your own 4d models.
 
 Feel free to make pull requests with your own creations!
+
+# Contributors
+
+### @FranzPoize
+
+For his nice 3-sphere shape.
