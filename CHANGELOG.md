@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2021-03-01
+
+### Added
+
+- 3-torus and flat-torus shapes thanks to @FranzPoise via #2
+
 ## [0.1.1] - 2021-02-11
 
 ### Added

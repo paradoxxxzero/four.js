@@ -3,6 +3,13 @@ import pentachoron from './pentachoron'
 import tesseract from './tesseract'
 import threesphere from './threesphere'
 import threetorus from './threetorus'
-import fourdflattorus from './fourdflattorus'
+import flattorus from './flattorus'
 
-export { tesseract, pentachoron, hexadecachoron, threesphere, threetorus, fourdflattorus}
+export {
+  tesseract,
+  pentachoron,
+  hexadecachoron,
+  threesphere,
+  threetorus,
+  flattorus,
+}
