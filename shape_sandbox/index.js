@@ -25,39 +25,11 @@ import {
   HyperPointsGeometry,
 } from 'four-js'
 
-const shape = {
-  vertices: [
-    [1, 1, 1, -1 / Math.sqrt(5)], // 0
-    [1, -1, -1, -1 / Math.sqrt(5)], // 1
-    [-1, 1, -1, -1 / Math.sqrt(5)], // 2
-    [-1, -1, 1, -1 / Math.sqrt(5)], // 3
-    [0, 0, 0, Math.sqrt(5) - 1 / Math.sqrt(5)], // 4
-  ],
-  faces: [
-    [1, 2, 3], // 0
-    [0, 1, 2], // 1
-    [0, 1, 3], // 2
-    [0, 3, 2], // 3
+import shape from './shape'
 
-    [0, 4, 1], // 4
-    [0, 2, 4], // 5
-    [0, 3, 4], // 6
-
-    [2, 4, 3], // 7
-    [1, 3, 4], // 8
-    [1, 4, 2], // 9
-  ],
-  cells: [
-    [0, 1, 2, 3], // 0
-    [1, 5, 4, 9], // 1
-    [3, 6, 5, 7], // 2
-    [2, 4, 6, 8], // 3
-    [0, 7, 8, 9], // 4
-  ],
-}
 const showFaces = true
 const showEdges = true
-const showPoints = true
+const showPoints = false
 
 const scene = new Scene()
 
@@ -108,7 +80,7 @@ if (showFaces) {
     material.blending = AdditiveBlending
     material.side = DoubleSide
     material.depthWrite = false
-    material.color = new Color(lotsofcolors[i] || 0xffffff)
+    material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
     return material
   })
   hyperMesh = new HyperMesh(hyperGeometry, materials)
@@ -130,8 +102,8 @@ if (showEdges) {
     material.blending = AdditiveBlending
     material.side = DoubleSide
     material.depthWrite = false
-    material.linewidth = 2
-    material.color = new Color(lotsofcolors[i] || 0xffffff)
+    material.linewidth = 0.5
+    material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
     return material
   })
   hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
@@ -152,7 +124,7 @@ if (showPoints) {
     material.map = DOT
     material.size = 0.25
     material.alphaTest = 0.5
-    material.color = new Color(lotsofcolors[i] || 0xffffff)
+    material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
 
     return material
   })
