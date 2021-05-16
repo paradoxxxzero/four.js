@@ -1,21 +1,26 @@
-export default {
+export const generateHyperCuboid = (
+  [xmin, xmax],
+  [ymin, ymax],
+  [zmin, zmax],
+  [wmin, wmax]
+) => ({
   vertices: [
-    [1, 1, 1, 1], // 0
-    [1, 1, -1, 1], // 1
-    [1, -1, -1, 1], // 2
-    [1, -1, 1, 1], // 3
-    [-1, 1, 1, 1], // 4
-    [-1, 1, -1, 1], // 5
-    [-1, -1, -1, 1], // 6
-    [-1, -1, 1, 1], // 7
-    [1, 1, 1, -1], // 8
-    [1, 1, -1, -1], // 9
-    [1, -1, -1, -1], // 10
-    [1, -1, 1, -1], // 11
-    [-1, 1, 1, -1], // 12
-    [-1, 1, -1, -1], // 13
-    [-1, -1, -1, -1], // 14
-    [-1, -1, 1, -1], // 15
+    [xmax, ymax, zmax, wmax], // 0
+    [xmax, ymax, zmin, wmax], // 1
+    [xmax, ymin, zmin, wmax], // 2
+    [xmax, ymin, zmax, wmax], // 3
+    [xmin, ymax, zmax, wmax], // 4
+    [xmin, ymax, zmin, wmax], // 5
+    [xmin, ymin, zmin, wmax], // 6
+    [xmin, ymin, zmax, wmax], // 7
+    [xmax, ymax, zmax, wmin], // 8
+    [xmax, ymax, zmin, wmin], // 9
+    [xmax, ymin, zmin, wmin], // 10
+    [xmax, ymin, zmax, wmin], // 11
+    [xmin, ymax, zmax, wmin], // 12
+    [xmin, ymax, zmin, wmin], // 13
+    [xmin, ymin, zmin, wmin], // 14
+    [xmin, ymin, zmax, wmin], // 15
   ],
   faces: [
     [0, 1, 2, 3], // 0
@@ -57,4 +62,15 @@ export default {
     [5, 7, 13, 9, 11, 23], // 6
     [18, 19, 20, 21, 22, 23], // 7
   ],
-}
+})
+
+export const hypercuboid = generateHyperCuboid(
+  [-0.25, 0.25],
+  [-0.5, 0.5],
+  [-0.75, 0.75],
+  [-1, 1]
+)
+export const generateTesseract = d =>
+  generateHyperCuboid([-d, d], [-d, d], [-d, d], [-d, d])
+
+export default generateTesseract(1)

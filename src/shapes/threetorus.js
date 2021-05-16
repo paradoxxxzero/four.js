@@ -1,4 +1,4 @@
-export function createTorus(r1, r2, r3, piResolution = 8) {
+export const generateThreeTorus = (r1, r2, r3, piResolution = 8) => {
   const vertices = []
   const faces = []
   const cells = []
@@ -13,7 +13,6 @@ export function createTorus(r1, r2, r3, piResolution = 8) {
   for (let theta = 0; theta <= piResolution; theta++) {
     for (let phi = 0; phi <= piResolution; phi++) {
       for (let gamma = 0; gamma < 2 * piResolution; gamma++) {
-        //for (let gamma = 0; gamma < 2 * piResolution; gamma+=piResolution) {
         if (!classOfVertex.theta[theta]) {
           classOfVertex.theta[theta] = []
         }
@@ -35,13 +34,9 @@ export function createTorus(r1, r2, r3, piResolution = 8) {
         vertices.push([
           r1 * Math.cos(thetaInPi),
           (r2 + r1 * Math.sin(thetaInPi)) * Math.cos(phiInPi),
-          (r3 + (r2 + r1 *
-            Math.sin(thetaInPi)) *
-            Math.sin(phiInPi)) *
+          (r3 + (r2 + r1 * Math.sin(thetaInPi)) * Math.sin(phiInPi)) *
             Math.cos(gammaInPi),
-          (r3 + (r2 + r1 *
-            Math.sin(thetaInPi)) *
-            Math.sin(phiInPi)) *
+          (r3 + (r2 + r1 * Math.sin(thetaInPi)) * Math.sin(phiInPi)) *
             Math.sin(gammaInPi),
         ])
       }
@@ -98,7 +93,7 @@ export function createTorus(r1, r2, r3, piResolution = 8) {
 
   for (let key in classOfVertex.gamma) {
     if (parseInt(key) < piResolution) {
-      //we need to reconstruct the rounds from the classvertex
+      // we need to reconstruct the rounds from the classvertex
       const vertexClassOne = classOfVertex.gamma[key]
       const vertexClassTwo = classOfVertex.gamma[parseInt(key) + piResolution]
 
@@ -155,4 +150,4 @@ export function createTorus(r1, r2, r3, piResolution = 8) {
   }
 }
 
-export default createTorus(0.1, 0.5, 1)
+export default generateThreeTorus(0.1, 0.5, 1)

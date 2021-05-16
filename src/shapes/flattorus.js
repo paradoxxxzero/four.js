@@ -1,4 +1,4 @@
-export function createFlatTorus(r1, r2, piResolution = 32) {
+export function generateFlatTorus(r1, r2, piResolution = 32) {
   const vertices = []
   const faces = []
   const cells = []
@@ -45,4 +45,4 @@ export function createFlatTorus(r1, r2, piResolution = 32) {
   }
 }
 
-export default createFlatTorus(1, 0.5)
+export default generateFlatTorus(1, 0.5)

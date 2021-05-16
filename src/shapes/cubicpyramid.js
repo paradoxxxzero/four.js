@@ -1,13 +1,18 @@
-export default {
+export const generateCuboidPyramid = (
+  [xmin, xmax],
+  [ymin, ymax],
+  [zmin, zmax],
+  w
+) => ({
   vertices: [
-    [-1, -1, -1, -1],
-    [-1, 1, -1, -1],
-    [-1, -1, 1, -1],
-    [1, -1, -1, -1],
-    [-1, 1, 1, -1],
-    [1, -1, 1, -1],
-    [1, 1, -1, -1],
-    [1, 1, 1, -1],
+    [xmin, ymin, zmin, w],
+    [xmin, ymax, zmin, w],
+    [xmin, ymin, zmax, w],
+    [xmax, ymin, zmin, w],
+    [xmin, ymax, zmax, w],
+    [xmax, ymin, zmax, w],
+    [xmax, ymax, zmin, w],
+    [xmax, ymax, zmax, w],
     [0, 0, 0, 0],
   ],
   faces: [
@@ -39,4 +44,14 @@ export default {
     [17, 7, 10, 14, 16],
     [0, 5, 9, 12, 15, 17],
   ],
-}
+})
+export const generateCubicPyramid = d =>
+  generateCuboidPyramid([-d, d], [-d, d], [-d, d], d)
+
+export const cuboidpyramid = generateCuboidPyramid(
+  [-0.25, 0.25],
+  [-0.5, 0.5],
+  [-0.75, 0.75],
+  1
+)
+export default generateCubicPyramid(1)
