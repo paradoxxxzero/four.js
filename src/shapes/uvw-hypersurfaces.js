@@ -58,12 +58,6 @@ export const generateUVWHyperSurface = (
   withCells.v && vCellGroups.map(vCells => cells.push(vCells))
   withCells.u && uCellGroups.map(uCells => cells.push(uCells))
 
-  console.log({
-    vertices,
-    faces,
-    cells,
-  })
-
   return {
     vertices,
     faces,
