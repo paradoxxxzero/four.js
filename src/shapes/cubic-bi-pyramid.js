@@ -1,0 +1,75 @@
+export const generateCuboidBiPyramid = (
+  [xmin, xmax],
+  [ymin, ymax],
+  [zmin, zmax],
+  [wmin, wmax]
+) => ({
+  vertices: [
+    [0.0, 0.0, 0.0, wmin],
+    [xmin, ymin, zmin, 0.0],
+    [xmin, ymin, zmax, 0.0],
+    [xmin, ymax, zmin, 0.0],
+    [xmin, ymax, zmax, 0.0],
+    [xmax, ymin, zmin, 0.0],
+    [xmax, ymin, zmax, 0.0],
+    [xmax, ymax, zmin, 0.0],
+    [xmax, ymax, zmax, 0.0],
+    [0.0, 0.0, 0.0, wmax],
+  ],
+  faces: [
+    [6, 8, 9],
+    [7, 8, 9],
+    [5, 7, 9],
+    [5, 6, 9],
+    [5, 6, 8, 7],
+    [4, 8, 9],
+    [3, 7, 9],
+    [3, 4, 9],
+    [3, 4, 8, 7],
+    [2, 6, 9],
+    [2, 4, 9],
+    [2, 4, 8, 6],
+    [1, 5, 9],
+    [1, 3, 9],
+    [1, 3, 7, 5],
+    [1, 2, 9],
+    [1, 2, 6, 5],
+    [1, 2, 4, 3],
+    [0, 7, 8],
+    [0, 6, 8],
+    [0, 5, 6],
+    [0, 5, 7],
+    [0, 4, 8],
+    [0, 3, 4],
+    [0, 3, 7],
+    [0, 2, 4],
+    [0, 2, 6],
+    [0, 1, 3],
+    [0, 1, 5],
+    [0, 1, 2],
+  ],
+  cells: [
+    [0, 1, 2, 3, 4],
+    [5, 1, 6, 7, 8],
+    [5, 0, 9, 10, 11],
+    [6, 2, 12, 13, 14],
+    [9, 3, 12, 15, 16],
+    [10, 7, 13, 15, 17],
+    [18, 19, 20, 21, 4],
+    [18, 22, 23, 24, 8],
+    [19, 22, 25, 26, 11],
+    [21, 24, 27, 28, 14],
+    [20, 26, 29, 28, 16],
+    [23, 25, 29, 27, 17],
+  ],
+})
+export const generateCubicBiPyramid = d =>
+  generateCuboidBiPyramid([-d, d], [-d, d], [-d, d], [-d, d])
+
+export const cuboidBiPyramid = generateCuboidBiPyramid(
+  [-0.25, 0.25],
+  [-0.5, 0.5],
+  [-0.75, 0.75],
+  [-1, 1]
+)
+export default generateCubicBiPyramid(1)

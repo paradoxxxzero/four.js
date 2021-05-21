@@ -2,14 +2,23 @@ import sage.all
 from json import dumps
 from pathlib import Path
 
-shape = sage.all.polytopes.cube()
+shape = sage.all.polytopes.cantitruncated_six_hundred_cell(
+    exact=True, backend="normaliz"
+)
+print("Calculating vertex adjacency matrix")
 adjency = shape.vertex_adjacency_matrix()
 
+print("Getting vertices")
 vertices = shape.vertices()
 faces = []
 cells = []
+print("Getting facets")
+facets = shape.facets()
+facets_len = len(facets)
 
-for cell in shape.facets():
+
+for i, cell in enumerate(facets):
+    print(f"Linking cell {i}/{facets_len}")
     c = []
     for face in cell.as_polyhedron().facets():
         vs = sorted([vertices.index(vertex) for vertex in face.vertices()])
@@ -29,12 +38,17 @@ for cell in shape.facets():
         c.append(faces.index(f))
     cells.append(c)
 
-
+print("Generating json")
 json = {
     "vertices": [[float(coord) for coord in v.vector()] for v in vertices],
     "faces": faces,
     "cells": cells,
 }
 
-with open(Path().absolute().parent / "shape_sandbox" / "shape.js", "w") as f:
+with open(
+    Path().absolute().parent
+    / "shape_sandbox"
+    / "shape_cantitruncated_six_hundred_cell.js",
+    "w",
+) as f:
     f.write(f"export default {dumps(json, indent=2)}")

@@ -2,6 +2,62 @@
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Some shapes has been renamed:
+  - `threesphere` -> `glome`
+  - `threetorus` -> `diTorus`
+  - `flattorus` -> `flatTorus`
+
+## Added
+
+- Add generators for simple polytopes to generate custom sizes: `generateTesseract`, `generateHyperCuboid`, `generateCuboidPyramid`, `generateCubicPyramid`, `generateGlome`, `generateDiTorus`, `generateFlatTorus`,`generateDuoCylinder`
+- Add uv surface generator and uvw hypersurface generator: `generateUVSurface`, `generateUVWHyperSurface`
+- Add lot of shapes:
+
+  - `hyperCuboid`
+  - `cubicPyramid`
+  - `cubicBiPyramid`
+  - `cuboidPyramid`
+  - `cuboidBiPyramid`
+  - `octahedralPyramid`
+  - `octahedralBiPyramid`
+  - `octahedraloidPyramid`
+  - `octahedraloidBiPyramid`
+  - `grandAntiPrism`
+  - `hecatonicosachoron`
+  - `hecatonicosachoronCantellated`
+  - `hexacosichoron`
+  - `hexacosichoronBitTruncated`
+  - `hexacosichoronCantellated`
+  - `icositetrachoron`
+  - `buckyBallPyramid`
+  - `minkowskiSumOfTesseractAndHexadecachoron`
+  - `permutahedronA`
+  - `permutahedronAIrregular`
+  - `permutahedronB`
+  - `permutahedronBIrregular`
+  - `permutahedronC`
+  - `permutahedronCIrregular`
+  - `permutahedronD`
+  - `permutahedronDIrregular`
+  - `permutahedronF`
+  - `permutahedronFIrregular`
+  - `permutahedronH`
+  - `permutahedronHIrregular`
+  - `crossHyperSurface`
+  - `rightHyperCone`
+  - `obliqueHyperCone`
+  - `spherinder`
+  - `torinder`
+  - `duoCylinder`
+  - `cubinder`
+  - `tiger`
+  - `torisphere`
+  - `spheritorus`
+
+- Glome and DiTorus are now generated with generateUVWHyperSurface
+
 ## [0.1.3] - 2021-05-15
 
 ### Added

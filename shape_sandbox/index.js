@@ -13,6 +13,7 @@ import {
   TextureLoader,
   PointsMaterial,
   Points,
+  NormalBlending,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
@@ -25,14 +26,16 @@ import {
   HyperPointsGeometry,
 } from 'four-js'
 
-import shape from './shape'
+// import { default as shape } from '../src/shapes/three-torus'
+import { default as shape } from '../src/shapes/uvw-hypersurfaces'
+// import { default as shape } from '../src/shapes/uv-surfaces'
 
 const showFaces = true
 const showEdges = true
 const showPoints = false
 
 const scene = new Scene()
-
+const cellSize = 100
 const renderer = new WebGLRenderer({ antialias: true })
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -61,7 +64,7 @@ scene.add(new AmbientLight(0x222222))
 camera.add(new PointLight(0xffffff, 1))
 
 // prettier-ignore
-const lotsofcolors = ['#5c6370', '#e06c75', '#98c379', '#d19a66', '#61afef', '#c678dd', '#56b6c2', '#ffffff', '#403e41', '#ff6188', '#a9dc76', '#ffd866', '#fc9867', '#ab9df2', '#78dce8', '#fcfcfa', '#1e2320', '#705050', '#60b48a', '#dfaf8f', '#506070', '#dc8cc3', '#8cd0d3', '#dcdccc', '#709080', '#dca3a3', '#c3bf9f', '#f0dfaf', '#94bff3', '#ec93d3', '#93e0e3', '#263238', '#ff9800', '#8bc34a', '#ffc107', '#03a9f4', '#e91e63', '#009688', '#cfd8dc', '#37474f', '#ffa74d', '#9ccc65', '#ffa000', '#81d4fa', '#ad1457', '#26a69a', '#eceff1']
+const lotsofcolors = ['#e06c75', '#98c379', '#d19a66', '#61afef', '#c678dd', '#56b6c2', '#ffffff', '#ff6188', '#a9dc76', '#ffd866', '#fc9867', '#ab9df2', '#78dce8', '#fcfcfa', '#705050', '#60b48a', '#dfaf8f', '#506070', '#dc8cc3', '#8cd0d3', '#dcdccc', '#709080', '#dca3a3', '#c3bf9f', '#f0dfaf', '#94bff3', '#ec93d3', '#93e0e3', '#263238', '#ff9800', '#8bc34a', '#ffc107', '#03a9f4', '#e91e63', '#009688', '#cfd8dc', '#37474f', '#ffa74d', '#9ccc65', '#ffa000', '#81d4fa', '#ad1457', '#26a69a', '#eceff1']
 
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
@@ -76,7 +79,7 @@ if (showFaces) {
   const materials = shape.cells.map((_, i) => {
     const material = new MeshLambertMaterial()
     material.transparent = true
-    material.opacity = 0.1
+    material.opacity = 0.05
     material.blending = AdditiveBlending
     material.side = DoubleSide
     material.depthWrite = false
@@ -84,6 +87,7 @@ if (showFaces) {
     return material
   })
   hyperMesh = new HyperMesh(hyperGeometry, materials)
+  hyperMesh.cellSize = cellSize
   scene.add(hyperMesh)
 }
 
@@ -97,16 +101,17 @@ if (showEdges) {
 
   const edgeMaterials = shape.cells.map((_, i) => {
     const material = new LineBasicMaterial()
-    material.opacity = 0.1
+    material.opacity = 0.05
     material.transparent = true
     material.blending = AdditiveBlending
     material.side = DoubleSide
     material.depthWrite = false
-    material.linewidth = 0.5
+    material.linewidth = 1
     material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
     return material
   })
   hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
+  hyperEdges.cellSize = cellSize
   scene.add(hyperEdges)
 }
 
@@ -129,6 +134,7 @@ if (showPoints) {
     return material
   })
   hyperPoints = new HyperMesh(hyperPointsGeometry, pointsMaterials, Points)
+  hyperPoints.cellSize = cellSize
   scene.add(hyperPoints)
 }
 

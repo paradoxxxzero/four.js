@@ -1,0 +1,59 @@
+export const generateOctahedraloidPyramid = (
+  [xmin, xmax],
+  [ymin, ymax],
+  [zmin, zmax],
+  w
+) => ({
+  vertices: [
+    [xmin, 0.0, 0.0, 0.0],
+    [0.0, ymin, 0.0, 0.0],
+    [0.0, 0.0, zmin, 0.0],
+    [0.0, 0.0, zmax, 0.0],
+    [0.0, ymax, 0.0, 0.0],
+    [xmax, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, w],
+  ],
+  faces: [
+    [4, 5, 6],
+    [3, 5, 6],
+    [3, 4, 6],
+    [3, 4, 5],
+    [2, 5, 6],
+    [2, 4, 6],
+    [2, 4, 5],
+    [1, 5, 6],
+    [1, 3, 6],
+    [1, 3, 5],
+    [1, 2, 6],
+    [1, 2, 5],
+    [0, 4, 6],
+    [0, 3, 6],
+    [0, 3, 4],
+    [0, 2, 6],
+    [0, 2, 4],
+    [0, 1, 6],
+    [0, 1, 3],
+    [0, 1, 2],
+  ],
+  cells: [
+    [0, 1, 2, 3],
+    [0, 4, 5, 6],
+    [1, 7, 8, 9],
+    [4, 7, 10, 11],
+    [2, 12, 13, 14],
+    [5, 12, 15, 16],
+    [8, 13, 17, 18],
+    [10, 15, 17, 19],
+    [3, 6, 9, 11, 14, 16, 18, 19],
+  ],
+})
+export const generateOctahedralPyramid = d =>
+  generateOctahedraloidPyramid([-d, d], [-d, d], [-d, d], d)
+
+export const octahedraloidPyramid = generateOctahedraloidPyramid(
+  [-0.25, 0.25],
+  [-0.5, 0.5],
+  [-0.75, 0.75],
+  1
+)
+export default generateOctahedralPyramid(1)

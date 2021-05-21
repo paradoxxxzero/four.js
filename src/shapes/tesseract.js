@@ -64,7 +64,7 @@ export const generateHyperCuboid = (
   ],
 })
 
-export const hypercuboid = generateHyperCuboid(
+export const hyperCuboid = generateHyperCuboid(
   [-0.25, 0.25],
   [-0.5, 0.5],
   [-0.75, 0.75],
