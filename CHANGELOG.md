@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-05-22
+
 ### Breaking Changes
 
 - Some shapes has been renamed:
@@ -86,7 +88,8 @@
 
 - All rendering components: `HyperMesh`, `HyperRenderer`, `HyperGeometry` `HyperEdgeGeometry`, `HyperPointsGeometry` and 3 shapes: `tesseract`, `pentachoron`, `hexadecachoron`.
 
-[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v0.1.3...HEAD
+[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/paradoxxxzero/four.js/compare/v0.1.3...v1.0.0
 [0.1.3]: https://github.com/paradoxxxzero/four.js/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/paradoxxxzero/four.js/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/paradoxxxzero/four.js/compare/v0.1.0...v0.1.1
