@@ -1,7 +1,7 @@
 export const generateUVSurface = (
   f,
-  [uMin, uMax, uResolution = 16, uInclusive = false],
-  [vMin, vMax, vResolution = 16, vInclusive = false]
+  [uMin, uMax, uResolution = 16, uInclusive = false, uLoop = true],
+  [vMin, vMax, vResolution = 16, vInclusive = false, vLoop = true]
 ) => {
   const vertices = []
   const faces = []
@@ -18,14 +18,17 @@ export const generateUVSurface = (
       )
       const uNext = u + 1 < uResolution ? u + 1 : 0
       const vNext = v + 1 < vResolution ? v + 1 : 0
-      faces.push([
-        u + v * uResolution,
-        uNext + v * uResolution,
-        uNext + vNext * uResolution,
-        u + vNext * uResolution,
-      ])
 
-      cell.push(faces.length - 1)
+      if ((uLoop || u + 1 < uResolution) && (vLoop || v + 1 < vResolution)) {
+        faces.push([
+          u + v * uResolution,
+          uNext + v * uResolution,
+          uNext + vNext * uResolution,
+          u + vNext * uResolution,
+        ])
+
+        cell.push(faces.length - 1)
+      }
     }
     if (cell.length) {
       cells.push(cell)

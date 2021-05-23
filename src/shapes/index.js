@@ -28,9 +28,11 @@ import octahedralBiPyramid, {
 import grandAntiPrism from './grand-anti-prism'
 import hecatonicosachoron from './hecatonicosachoron'
 import hecatonicosachoronCantellated from './hecatonicosachoron-cantellated'
+import hecatonicosachoronCantitruncated from './hecatonicosachoron-cantitruncated'
 import hexacosichoron from './hexacosichoron'
 import hexacosichoronBitTruncated from './hexacosichoron-bit-truncated'
 import hexacosichoronCantellated from './hexacosichoron-cantellated'
+import hexacosichoronCantitruncated from './hexacosichoron-cantitruncated'
 import icositetrachoron from './icositetrachoron'
 import buckyBallPyramid from './buckyball-pyramid'
 import minkowskiSumOfTesseractAndHexadecachoron from './minkowski-sum-of-tesseract-and-hexadecachoron'
@@ -79,9 +81,11 @@ export {
   grandAntiPrism,
   hecatonicosachoron,
   hecatonicosachoronCantellated,
+  hecatonicosachoronCantitruncated,
   hexacosichoron,
   hexacosichoronBitTruncated,
   hexacosichoronCantellated,
+  hexacosichoronCantitruncated,
   icositetrachoron,
   buckyBallPyramid,
   minkowskiSumOfTesseractAndHexadecachoron,

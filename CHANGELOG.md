@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2021-05-23
+
+## Added
+
+- `uLoop`, `vLoop` parameters for `generateUVSurface` to control if the surface should close on itself
+- `uLoop`, `vLoop`, `wLoop` parameters for `generateUVWHyperSurface` to control if the hypersurface should close on itself
+
+- `hecatonicosachoronCantitruncated` and `hexacosichoronCantitruncated` shapes
+
 ## [1.0.1] - 2021-05-22
 
 - Rerelease (with correct built version...)
@@ -92,7 +101,8 @@
 
 - All rendering components: `HyperMesh`, `HyperRenderer`, `HyperGeometry` `HyperEdgeGeometry`, `HyperPointsGeometry` and 3 shapes: `tesseract`, `pentachoron`, `hexadecachoron`.
 
-[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/paradoxxxzero/four.js/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/paradoxxxzero/four.js/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/paradoxxxzero/four.js/compare/v0.1.3...v1.0.0
 [0.1.3]: https://github.com/paradoxxxzero/four.js/compare/v0.1.2...v0.1.3

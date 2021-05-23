@@ -2,7 +2,7 @@ import sage.all
 from json import dumps
 from pathlib import Path
 
-shape = sage.all.polytopes.cantitruncated_six_hundred_cell(
+shape = sage.all.polytopes.omnitruncated_six_hundred_cellj(
     exact=True, backend="normaliz"
 )
 print("Calculating vertex adjacency matrix")
@@ -48,7 +48,7 @@ json = {
 with open(
     Path().absolute().parent
     / "shape_sandbox"
-    / "shape_cantitruncated_six_hundred_cell.js",
+    / "shape_omnitruncated_six_hundred_cellj.js",
     "w",
 ) as f:
     f.write(f"export default {dumps(json, indent=2)}")

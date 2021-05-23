@@ -1,8 +1,8 @@
 export const generateUVWHyperSurface = (
   f,
-  [uMin, uMax, uResolution = 16, uInclusive = false],
-  [vMin, vMax, vResolution = 16, vInclusive = false],
-  [wMin, wMax, wResolution = 16, wInclusive = false],
+  [uMin, uMax, uResolution = 16, uInclusive = false, uLoop = true],
+  [vMin, vMax, vResolution = 16, vInclusive = false, vLoop = true],
+  [wMin, wMax, wResolution = 16, wInclusive = false, wLoop = true],
   withCells = { u: true, v: true, w: true }
 ) => {
   const vertices = []
@@ -27,27 +27,33 @@ export const generateUVWHyperSurface = (
         const uNext = u + 1 < uResolution ? u + 1 : 0
         const vNext = v + 1 < vResolution ? v + 1 : 0
         const wNext = w + 1 < wResolution ? w + 1 : 0
-        faces.push([
-          u + v * uResolution + w * uResolution * vResolution,
-          uNext + v * uResolution + w * uResolution * vResolution,
-          uNext + vNext * uResolution + w * uResolution * vResolution,
-          u + vNext * uResolution + w * uResolution * vResolution,
-        ])
-        wCells.push(faces.length - 1)
-        faces.push([
-          u + v * uResolution + w * uResolution * vResolution,
-          u + v * uResolution + wNext * uResolution * vResolution,
-          uNext + v * uResolution + wNext * uResolution * vResolution,
-          uNext + v * uResolution + w * uResolution * vResolution,
-        ])
-        vCells.push(faces.length - 1)
-        faces.push([
-          u + v * uResolution + w * uResolution * vResolution,
-          u + v * uResolution + wNext * uResolution * vResolution,
-          u + vNext * uResolution + wNext * uResolution * vResolution,
-          u + vNext * uResolution + w * uResolution * vResolution,
-        ])
-        uCells.push(faces.length - 1)
+        if ((uLoop || u + 1 < uResolution) && (vLoop || v + 1 < vResolution)) {
+          faces.push([
+            u + v * uResolution + w * uResolution * vResolution,
+            uNext + v * uResolution + w * uResolution * vResolution,
+            uNext + vNext * uResolution + w * uResolution * vResolution,
+            u + vNext * uResolution + w * uResolution * vResolution,
+          ])
+          wCells.push(faces.length - 1)
+        }
+        if ((uLoop || u + 1 < uResolution) && (wLoop || w + 1 < wResolution)) {
+          faces.push([
+            u + v * uResolution + w * uResolution * vResolution,
+            u + v * uResolution + wNext * uResolution * vResolution,
+            uNext + v * uResolution + wNext * uResolution * vResolution,
+            uNext + v * uResolution + w * uResolution * vResolution,
+          ])
+          vCells.push(faces.length - 1)
+        }
+        if ((vLoop || v + 1 < vResolution) && (wLoop || w + 1 < wResolution)) {
+          faces.push([
+            u + v * uResolution + w * uResolution * vResolution,
+            u + v * uResolution + wNext * uResolution * vResolution,
+            u + vNext * uResolution + wNext * uResolution * vResolution,
+            u + vNext * uResolution + w * uResolution * vResolution,
+          ])
+          uCells.push(faces.length - 1)
+        }
 
         uCellGroups[u] = uCells
       }

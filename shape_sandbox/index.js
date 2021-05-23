@@ -27,8 +27,18 @@ import {
 } from 'four-js'
 
 // import { default as shape } from '../src/shapes/three-torus'
-import { default as shape } from '../src/shapes/uvw-hypersurfaces'
-// import { default as shape } from '../src/shapes/uv-surfaces'
+// import { default as shape } from '../src/shapes/uvw-hypersurfaces'
+import { generateUVSurface } from '../src/shapes/uv-surfaces'
+const shape = generateUVSurface(
+  (u, v) => [
+    (1.5 + 0.95 * Math.cos(v)) * Math.cos(u),
+    (1.5 + 0.95 * Math.cos(v)) * Math.sin(u),
+    0.95 * Math.sin(v) * Math.cos(u / 2),
+    0.95 * Math.sin(v) * Math.sin(u / 2),
+  ],
+  [0, 2 * Math.PI, 32, true, false],
+  [0, 2 * Math.PI, 32, true]
+)
 
 const showFaces = true
 const showEdges = true
@@ -79,7 +89,7 @@ if (showFaces) {
   const materials = shape.cells.map((_, i) => {
     const material = new MeshLambertMaterial()
     material.transparent = true
-    material.opacity = 0.05
+    material.opacity = 0.25
     material.blending = AdditiveBlending
     material.side = DoubleSide
     material.depthWrite = false
@@ -101,7 +111,7 @@ if (showEdges) {
 
   const edgeMaterials = shape.cells.map((_, i) => {
     const material = new LineBasicMaterial()
-    material.opacity = 0.05
+    material.opacity = 0.1
     material.transparent = true
     material.blending = AdditiveBlending
     material.side = DoubleSide
