@@ -29,10 +29,19 @@ import grandAntiPrism from './grand-anti-prism'
 import hecatonicosachoron from './hecatonicosachoron'
 import hecatonicosachoronCantellated from './hecatonicosachoron-cantellated'
 import hecatonicosachoronCantitruncated from './hecatonicosachoron-cantitruncated'
+import hecatonicosachoronRectified from './hecatonicosachoron-rectified'
+import hecatonicosachoronRuncinated from './hecatonicosachoron-runcinated'
+import hecatonicosachoronRuncitruncated from './hecatonicosachoron-runcitruncated'
+import hecatonicosachoronOmnitruncated from './hecatonicosachoron-omnitruncated'
+import hecatonicosachoronTruncated from './hecatonicosachoron-truncated'
 import hexacosichoron from './hexacosichoron'
-import hexacosichoronBitTruncated from './hexacosichoron-bit-truncated'
+import hexacosichoronBittruncated from './hexacosichoron-bittruncated'
 import hexacosichoronCantellated from './hexacosichoron-cantellated'
 import hexacosichoronCantitruncated from './hexacosichoron-cantitruncated'
+import hexacosichoronRectified from './hexacosichoron-rectified'
+import hexacosichoronRuncitruncated from './hexacosichoron-runcitruncated'
+import hexacosichoronOmnitruncated from './hexacosichoron-omnitruncated'
+import hexacosichoronTruncated from './hexacosichoron-truncated'
 import icositetrachoron from './icositetrachoron'
 import buckyBallPyramid from './buckyball-pyramid'
 import minkowskiSumOfTesseractAndHexadecachoron from './minkowski-sum-of-tesseract-and-hexadecachoron'
@@ -41,7 +50,7 @@ import permutahedronB, { permutahedronBIrregular } from './permutahedron-b'
 import permutahedronC, { permutahedronCIrregular } from './permutahedron-c'
 import permutahedronD, { permutahedronDIrregular } from './permutahedron-d'
 import permutahedronF, { permutahedronFIrregular } from './permutahedron-f'
-import { /*permutahedronH,*/ permutahedronHIrregular } from './permutahedron-h'
+import permutahedronH, { permutahedronHIrregular } from './permutahedron-h'
 import crossTorus, {
   flatTorus,
   duoCylinder,
@@ -82,10 +91,19 @@ export {
   hecatonicosachoron,
   hecatonicosachoronCantellated,
   hecatonicosachoronCantitruncated,
+  hecatonicosachoronRectified,
+  hecatonicosachoronRuncinated,
+  hecatonicosachoronRuncitruncated,
+  hecatonicosachoronOmnitruncated,
+  hecatonicosachoronTruncated,
   hexacosichoron,
-  hexacosichoronBitTruncated,
+  hexacosichoronBittruncated,
   hexacosichoronCantellated,
   hexacosichoronCantitruncated,
+  hexacosichoronRectified,
+  hexacosichoronRuncitruncated,
+  hexacosichoronOmnitruncated,
+  hexacosichoronTruncated,
   icositetrachoron,
   buckyBallPyramid,
   minkowskiSumOfTesseractAndHexadecachoron,
@@ -99,7 +117,7 @@ export {
   permutahedronDIrregular,
   permutahedronF,
   permutahedronFIrregular,
-  // permutahedronH,
+  permutahedronH,
   permutahedronHIrregular,
   crossTorus,
   flatTorus,

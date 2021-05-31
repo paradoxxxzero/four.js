@@ -7,13 +7,13 @@ import {
   PerspectiveCamera,
   MeshLambertMaterial,
   AdditiveBlending,
+  NormalBlending,
   DoubleSide,
   LineBasicMaterial,
   LineSegments,
   TextureLoader,
   PointsMaterial,
   Points,
-  NormalBlending,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
@@ -26,20 +26,21 @@ import {
   HyperPointsGeometry,
 } from 'four-js'
 
-// import { default as shape } from '../src/shapes/three-torus'
+import { hecatonicosachoronTruncated as shape } from '../src/shapes'
 // import { default as shape } from '../src/shapes/uvw-hypersurfaces'
-import { generateUVSurface } from '../src/shapes/uv-surfaces'
-const shape = generateUVSurface(
-  (u, v) => [
-    (1.5 + 0.95 * Math.cos(v)) * Math.cos(u),
-    (1.5 + 0.95 * Math.cos(v)) * Math.sin(u),
-    0.95 * Math.sin(v) * Math.cos(u / 2),
-    0.95 * Math.sin(v) * Math.sin(u / 2),
-  ],
-  [0, 2 * Math.PI, 32, true, false],
-  [0, 2 * Math.PI, 32, true]
-)
+// import { generateUVSurface } from '../src/shapes/uv-surfaces'
+// const shape = generateUVSurface(
+//   (u, v) => [
+//     (1.5 + 0.95 * Math.cos(v)) * Math.cos(u),
+//     (1.5 + 0.95 * Math.cos(v)) * Math.sin(u),
+//     0.95 * Math.sin(v) * Math.cos(u / 2),
+//     0.95 * Math.sin(v) * Math.sin(u / 2),
+//   ],
+//   [0, 2 * Math.PI, 32, true, false],
+//   [0, 2 * Math.PI, 32, true]
+// )
 
+const scale = 5
 const showFaces = true
 const showEdges = true
 const showPoints = false
@@ -90,7 +91,7 @@ if (showFaces) {
     const material = new MeshLambertMaterial()
     material.transparent = true
     material.opacity = 0.25
-    material.blending = AdditiveBlending
+    material.blending = NormalBlending
     material.side = DoubleSide
     material.depthWrite = false
     material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
@@ -98,6 +99,7 @@ if (showFaces) {
   })
   hyperMesh = new HyperMesh(hyperGeometry, materials)
   hyperMesh.cellSize = cellSize
+  hyperMesh.scale.setScalar(scale)
   scene.add(hyperMesh)
 }
 
@@ -122,6 +124,7 @@ if (showEdges) {
   })
   hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
   hyperEdges.cellSize = cellSize
+  hyperEdges.scale.setScalar(scale)
   scene.add(hyperEdges)
 }
 
@@ -145,6 +148,7 @@ if (showPoints) {
   })
   hyperPoints = new HyperMesh(hyperPointsGeometry, pointsMaterials, Points)
   hyperPoints.cellSize = cellSize
+  hyperPoints.scale.setScalar(scale)
   scene.add(hyperPoints)
 }
 
