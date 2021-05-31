@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## [1.0.3] - 2021-05-31
+
+- Add remaining sage shapes:
+  - `hecatonicosachoronRectified`
+  - `hecatonicosachoronRuncinated`
+  - `hecatonicosachoronRuncitruncated`
+  - `hecatonicosachoronOmnitruncated`
+  - `hecatonicosachoronTruncated`
+  - `hexacosichoronRectified`
+  - `hexacosichoronRuncitruncated`
+  - `hexacosichoronOmnitruncated`
+  - `hexacosichoronTruncated`
+  - `permutahedronH`
+
 ## [1.0.2] - 2021-05-23
 
 ## Added
@@ -101,7 +115,8 @@
 
 - All rendering components: `HyperMesh`, `HyperRenderer`, `HyperGeometry` `HyperEdgeGeometry`, `HyperPointsGeometry` and 3 shapes: `tesseract`, `pentachoron`, `hexadecachoron`.
 
-[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.0.2...HEAD
+[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/paradoxxxzero/four.js/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/paradoxxxzero/four.js/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/paradoxxxzero/four.js/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/paradoxxxzero/four.js/compare/v0.1.3...v1.0.0
