@@ -2,10 +2,13 @@ import { BufferAttribute, BufferGeometry, DynamicDrawUsage } from 'three'
 
 export default class HyperGeometry {
   constructor(vertices, faces, cells, hyperRenderer) {
-    this.vertices = vertices
+    this.hyperRenderer = hyperRenderer
+    this.vertices4 = vertices
+    this.vertices = this.vertices4.map(
+      this.hyperRenderer.project.bind(this.hyperRenderer)
+    )
     this.faces = faces
     this.cells = cells
-    this.hyperRenderer = hyperRenderer
 
     this.geometries = this.cells.map(cell => {
       const faces = cell.map(faceIndex => this.faces[faceIndex])
@@ -21,8 +24,7 @@ export default class HyperGeometry {
         // Project points
         face
           .map(verticeIndex => this.vertices[verticeIndex])
-          .forEach(vertice => {
-            const [x, y, z] = this.hyperRenderer.project(vertice)
+          .forEach(([x, y, z]) => {
             positions[pos++] = x
             positions[pos++] = y
             positions[pos++] = z
@@ -48,6 +50,9 @@ export default class HyperGeometry {
   }
 
   update() {
+    this.vertices = this.vertices4.map(
+      this.hyperRenderer.project.bind(this.hyperRenderer)
+    )
     this.cells.map((cell, cellIndex) => {
       const geometry = this.geometries[cellIndex]
 
@@ -57,8 +62,7 @@ export default class HyperGeometry {
         .forEach(face => {
           face
             .map(verticeIndex => this.vertices[verticeIndex])
-            .forEach(vertice => {
-              const [x, y, z] = this.hyperRenderer.project(vertice)
+            .forEach(([x, y, z]) => {
               geometry.attributes.position.array[pos++] = x
               geometry.attributes.position.array[pos++] = y
               geometry.attributes.position.array[pos++] = z

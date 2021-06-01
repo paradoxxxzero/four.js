@@ -1,16 +1,15 @@
 import { BufferAttribute, BufferGeometry, DynamicDrawUsage } from 'three'
 
 export default class HyperEdgeGeometry {
-  constructor(vertices, faces, cells, hyperRenderer) {
-    this.vertices = vertices
-    this.faces = faces
-    this.cells = cells
+  constructor(hyperGeometry, hyperRenderer) {
+    this.hyperGeometry = hyperGeometry
     this.hyperRenderer = hyperRenderer
+    const { vertices, faces, cells } = this.hyperGeometry
 
-    this.geometries = this.cells.map(cell => {
-      const faces = cell.map(faceIndex => this.faces[faceIndex])
+    this.geometries = cells.map(cell => {
+      const cell_faces = cell.map(faceIndex => faces[faceIndex])
 
-      const verticesCount = faces.reduce(
+      const verticesCount = cell_faces.reduce(
         (sum, face) => sum + face.length * 2,
         0
       )
@@ -18,16 +17,15 @@ export default class HyperEdgeGeometry {
       const positions = new Float32Array(verticesCount * 3)
 
       let pos = 0
-      faces.forEach(face => {
+      cell_faces.forEach(face => {
         // Project points
         face
           .map((verticeIndex, i) => [
-            this.vertices[verticeIndex],
-            this.vertices[face[(i + 1) % face.length]],
+            vertices[verticeIndex],
+            vertices[face[(i + 1) % face.length]],
           ])
           .flat()
-          .forEach(vertice => {
-            const [x, y, z] = this.hyperRenderer.project(vertice)
+          .forEach(([x, y, z]) => {
             positions[pos++] = x
             positions[pos++] = y
             positions[pos++] = z
@@ -44,21 +42,22 @@ export default class HyperEdgeGeometry {
   }
 
   update() {
-    this.cells.map((cell, cellIndex) => {
+    const { vertices, faces, cells } = this.hyperGeometry
+
+    cells.map((cell, cellIndex) => {
       const geometry = this.geometries[cellIndex]
 
       let pos = 0
       cell
-        .map(faceIndex => this.faces[faceIndex])
+        .map(faceIndex => faces[faceIndex])
         .forEach(face => {
           face
             .map((verticeIndex, i) => [
-              this.vertices[verticeIndex],
-              this.vertices[face[(i + 1) % face.length]],
+              vertices[verticeIndex],
+              vertices[face[(i + 1) % face.length]],
             ])
             .flat()
-            .forEach(vertice => {
-              const [x, y, z] = this.hyperRenderer.project(vertice)
+            .forEach(([x, y, z]) => {
               geometry.attributes.position.array[pos++] = x
               geometry.attributes.position.array[pos++] = y
               geometry.attributes.position.array[pos++] = z

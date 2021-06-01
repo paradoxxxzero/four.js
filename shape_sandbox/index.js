@@ -12,10 +12,12 @@ import {
   LineBasicMaterial,
   LineSegments,
   TextureLoader,
+  ShaderMaterial,
   PointsMaterial,
   Points,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import Stats from 'stats.js'
 
 import disc from './disc.png'
 import {
@@ -43,14 +45,15 @@ import { hecatonicosachoronTruncated as shape } from '../src/shapes'
 const scale = 5
 const showFaces = true
 const showEdges = true
-const showPoints = false
-
+const showPoints = true
+const stats = new Stats()
 const scene = new Scene()
 const cellSize = 100
 const renderer = new WebGLRenderer({ antialias: true })
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
+document.body.appendChild(stats.dom)
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
@@ -80,82 +83,105 @@ const lotsofcolors = ['#e06c75', '#98c379', '#d19a66', '#61afef', '#c678dd', '#5
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
 let hyperMesh, hyperEdges, hyperPoints
-if (showFaces) {
-  const hyperGeometry = new HyperGeometry(
-    shape.vertices,
-    shape.faces,
-    shape.cells,
-    hyperRenderer
-  )
-  const materials = shape.cells.map((_, i) => {
-    const material = new MeshLambertMaterial()
-    material.transparent = true
-    material.opacity = 0.25
-    material.blending = NormalBlending
-    material.side = DoubleSide
-    material.depthWrite = false
-    material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
-    return material
+const hyperGeometry = new HyperGeometry(
+  shape.vertices,
+  shape.faces,
+  shape.cells,
+  hyperRenderer
+)
+const materials = shape.cells.map((_, i) => {
+  const material = new MeshLambertMaterial()
+  material.transparent = true
+  material.opacity = 0.25
+  material.blending = NormalBlending
+  material.side = DoubleSide
+  material.depthWrite = false
+  material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
+  return material
+})
+hyperMesh = new HyperMesh(hyperGeometry, materials)
+hyperMesh.cellSize = cellSize
+hyperMesh.scale.setScalar(scale)
+hyperMesh.visible = showFaces
+scene.add(hyperMesh)
+
+const hyperEdgesGeometry = new HyperEdgeGeometry(hyperGeometry, hyperRenderer)
+
+const edgeMaterials = shape.cells.map((_, i) => {
+  const material = new LineBasicMaterial()
+  material.opacity = 0.1
+  material.transparent = true
+  material.blending = AdditiveBlending
+  material.side = DoubleSide
+  material.depthWrite = false
+  material.linewidth = 1
+  material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
+  return material
+})
+hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
+hyperEdges.cellSize = cellSize
+hyperEdges.scale.setScalar(scale)
+hyperEdges.visible = showEdges
+scene.add(hyperEdges)
+
+const hyperPointsGeometry = new HyperPointsGeometry(
+  hyperGeometry,
+  hyperRenderer
+)
+
+// const DOT = new TextureLoader().load(disc)
+// const pointsMaterials = shape.cells.map((_, i) => {
+//   const material = new PointsMaterial()
+//   material.map = DOT
+//   material.size = 0.25
+//   material.alphaTest = 0.5
+//   material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
+
+//   return material
+// })
+const pointsMaterials = shape.cells.map((_, i) => {
+  const material = new ShaderMaterial({
+    uniforms: {
+      size: { value: 5 },
+      opacity: { value: 0.5 },
+      color: { value: new Color(lotsofcolors[i % (lotsofcolors.length - 1)]) },
+    },
+    vertexShader: `uniform float size;
+    
+    void main() {
+    
+      vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+    
+      gl_PointSize = size * ( 10.0 / - mvPosition.z );
+    
+      gl_Position = projectionMatrix * mvPosition;
+    }`,
+    fragmentShader: `
+    uniform vec3 color;
+    uniform float opacity;
+
+      void main() {
+      
+        if (length(gl_PointCoord - vec2( 0.5, 0.5 )) > 0.475) discard;
+      
+        gl_FragColor = vec4(color, opacity );
+      } `,
   })
-  hyperMesh = new HyperMesh(hyperGeometry, materials)
-  hyperMesh.cellSize = cellSize
-  hyperMesh.scale.setScalar(scale)
-  scene.add(hyperMesh)
-}
-
-if (showEdges) {
-  const hyperEdgesGeometry = new HyperEdgeGeometry(
-    shape.vertices,
-    shape.faces,
-    shape.cells,
-    hyperRenderer
-  )
-
-  const edgeMaterials = shape.cells.map((_, i) => {
-    const material = new LineBasicMaterial()
-    material.opacity = 0.1
-    material.transparent = true
-    material.blending = AdditiveBlending
-    material.side = DoubleSide
-    material.depthWrite = false
-    material.linewidth = 1
-    material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
-    return material
-  })
-  hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
-  hyperEdges.cellSize = cellSize
-  hyperEdges.scale.setScalar(scale)
-  scene.add(hyperEdges)
-}
-
-if (showPoints) {
-  const hyperPointsGeometry = new HyperPointsGeometry(
-    shape.vertices,
-    shape.faces,
-    shape.cells,
-    hyperRenderer
-  )
-
-  const DOT = new TextureLoader().load(disc)
-  const pointsMaterials = shape.cells.map((_, i) => {
-    const material = new PointsMaterial()
-    material.map = DOT
-    material.size = 0.25
-    material.alphaTest = 0.5
-    material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
-
-    return material
-  })
-  hyperPoints = new HyperMesh(hyperPointsGeometry, pointsMaterials, Points)
-  hyperPoints.cellSize = cellSize
-  hyperPoints.scale.setScalar(scale)
-  scene.add(hyperPoints)
-}
+  material.transparent = true
+  material.depthWrite = false
+  return material
+})
+hyperPoints = new HyperMesh(hyperPointsGeometry, pointsMaterials, Points)
+hyperPoints.cellSize = cellSize
+hyperPoints.scale.setScalar(scale)
+hyperPoints.visible = showPoints
+scene.add(hyperPoints)
 
 function render() {
+  stats.update()
   requestAnimationFrame(render)
   hyperRenderer.rotate({ xy: 0, xz: 0, xw: 5, yz: 0, yw: 10, zw: 10 })
-  showFaces && hyperMesh.update()
+  hyperMesh.update()
   showEdges && hyperEdges.update()
   showPoints && hyperPoints.update()
   renderer.render(scene, camera)

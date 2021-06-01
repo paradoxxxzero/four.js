@@ -1,20 +1,18 @@
 import { BufferAttribute, BufferGeometry, DynamicDrawUsage } from 'three'
 
 export default class HyperPointsGeometry {
-  constructor(vertices, faces, cells, hyperRenderer) {
-    this.vertices = vertices
-    this.faces = faces
-    this.cells = cells
+  constructor(hyperGeometry, hyperRenderer) {
+    this.hyperGeometry = hyperGeometry
     this.hyperRenderer = hyperRenderer
 
-    this.geometries = this.cells.map(cell => {
+    const { vertices, faces, cells } = this.hyperGeometry
+
+    this.geometries = cells.map(cell => {
       const allVertices = [
         ...new Set(
           cell
             .map(faceIndex =>
-              this.faces[faceIndex].map(
-                verticeIndex => this.vertices[verticeIndex]
-              )
+              faces[faceIndex].map(verticeIndex => vertices[verticeIndex])
             )
             .flat()
         ),
@@ -23,8 +21,7 @@ export default class HyperPointsGeometry {
       const positions = new Float32Array(allVertices.length * 3)
 
       let pos = 0
-      allVertices.forEach(vertice => {
-        const [x, y, z] = this.hyperRenderer.project(vertice)
+      allVertices.forEach(([x, y, z]) => {
         positions[pos++] = x
         positions[pos++] = y
         positions[pos++] = z
@@ -40,22 +37,21 @@ export default class HyperPointsGeometry {
   }
 
   update() {
-    this.cells.map((cell, cellIndex) => {
+    const { vertices, faces, cells } = this.hyperGeometry
+
+    cells.map((cell, cellIndex) => {
       const geometry = this.geometries[cellIndex]
       const allVertices = [
         ...new Set(
           cell
             .map(faceIndex =>
-              this.faces[faceIndex].map(
-                verticeIndex => this.vertices[verticeIndex]
-              )
+              faces[faceIndex].map(verticeIndex => vertices[verticeIndex])
             )
             .flat()
         ),
       ]
       let pos = 0
-      allVertices.forEach(vertice => {
-        const [x, y, z] = this.hyperRenderer.project(vertice)
+      allVertices.forEach(([x, y, z]) => {
         geometry.attributes.position.array[pos++] = x
         geometry.attributes.position.array[pos++] = y
         geometry.attributes.position.array[pos++] = z
