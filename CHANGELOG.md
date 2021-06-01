@@ -2,7 +2,22 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-06-01
+
+## Breaking Changes
+
+- Renamed `HyperEdgeGeometry` to `HyperEdgesGeometry`
+- Changed signature of `HyperEdgesGeometry` and `HyperPointsGeometry` to accept an `HyperGeometry` instead of shape `vertices`, `faces`, `cells` to avoid multiple projections. The `HyperGeometry` must now be updated even if not rendered.
+
+## Added
+
+- `HyperGeometryMergedVertices` which further reuse vertices at the expense of having one normal by vertex.
+
+- `HyperEdgesGeometryMergedEdges` which use only one Line for performance (but doesn't support cellSize).
+
 ## [1.0.3] - 2021-05-31
+
+## Added
 
 - Add remaining sage shapes:
   - `hecatonicosachoronRectified`
@@ -115,7 +130,8 @@
 
 - All rendering components: `HyperMesh`, `HyperRenderer`, `HyperGeometry` `HyperEdgeGeometry`, `HyperPointsGeometry` and 3 shapes: `tesseract`, `pentachoron`, `hexadecachoron`.
 
-[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.0.3...HEAD
+[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/paradoxxxzero/four.js/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/paradoxxxzero/four.js/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/paradoxxxzero/four.js/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/paradoxxxzero/four.js/compare/v1.0.0...v1.0.1

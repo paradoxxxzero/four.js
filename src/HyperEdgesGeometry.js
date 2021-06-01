@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry, DynamicDrawUsage } from 'three'
 
-export default class HyperEdgeGeometry {
+export default class HyperEdgesGeometry {
   constructor(hyperGeometry, hyperRenderer) {
     this.hyperGeometry = hyperGeometry
     this.hyperRenderer = hyperRenderer

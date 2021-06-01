@@ -25,9 +25,9 @@ import {
   HyperMesh,
   HyperGeometry,
   HyperRenderer,
-  HyperEdgeGeometry,
+  HyperEdgesGeometry,
   HyperGeometryMergedVertices,
-  HyperEdgeGeometryMergedEdges,
+  HyperEdgesGeometryMergedEdges,
   HyperPointsGeometry,
 } from 'four-js'
 
@@ -86,8 +86,8 @@ const lotsofcolors = ['#e06c75', '#98c379', '#d19a66', '#61afef', '#c678dd', '#5
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
 let hyperMesh, hyperEdges, hyperPoints
-// const hyperGeometry = new HyperGeometryMergedVertices(
-const hyperGeometry = new HyperGeometry(
+const hyperGeometry = new HyperGeometryMergedVertices(
+  // const hyperGeometry = new HyperGeometry(
   shape.vertices,
   shape.faces,
   shape.cells,
@@ -111,11 +111,11 @@ hyperMesh.scale.setScalar(scale)
 hyperMesh.visible = showFaces
 scene.add(hyperMesh)
 
-const hyperEdgesGeometry = new HyperEdgeGeometry(hyperGeometry, hyperRenderer)
+const hyperEdgesGeometry = new HyperEdgesGeometry(hyperGeometry, hyperRenderer)
 
 const edgeMaterials = shape.cells.map((_, i) => {
   const material = new LineBasicMaterial()
-  material.opacity = 0.01
+  material.opacity = 0.1
   material.transparent = true
   material.blending = AdditiveBlending
   material.depthWrite = false
@@ -128,7 +128,7 @@ hyperEdges.cellSize = cellSize
 hyperEdges.scale.setScalar(scale)
 hyperEdges.visible = showEdges
 scene.add(hyperEdges)
-// const hyperEdgesGeometry = new HyperEdgeGeometryMergedEdges(
+// const hyperEdgesGeometry = new HyperEdgesGeometryMergedEdges(
 //   hyperGeometry,
 //   hyperRenderer
 // )
