@@ -8,6 +8,7 @@ import {
   MeshLambertMaterial,
   AdditiveBlending,
   NormalBlending,
+  CustomBlending,
   DoubleSide,
   LineBasicMaterial,
   LineSegments,
@@ -25,6 +26,8 @@ import {
   HyperGeometry,
   HyperRenderer,
   HyperEdgeGeometry,
+  HyperGeometryMergedVertices,
+  HyperEdgeGeometryMergedEdges,
   HyperPointsGeometry,
 } from 'four-js'
 
@@ -42,10 +45,10 @@ import { hecatonicosachoronTruncated as shape } from '../src/shapes'
 //   [0, 2 * Math.PI, 32, true]
 // )
 
-const scale = 5
+const scale = 2
 const showFaces = true
 const showEdges = true
-const showPoints = true
+const showPoints = !true
 const stats = new Stats()
 const scene = new Scene()
 const cellSize = 100
@@ -65,7 +68,7 @@ const camera = new PerspectiveCamera(
   40,
   window.innerWidth / window.innerHeight,
   1,
-  1000
+  100
 )
 camera.position.set(0, 0, 10)
 scene.add(camera)
@@ -83,6 +86,7 @@ const lotsofcolors = ['#e06c75', '#98c379', '#d19a66', '#61afef', '#c678dd', '#5
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
 let hyperMesh, hyperEdges, hyperPoints
+// const hyperGeometry = new HyperGeometryMergedVertices(
 const hyperGeometry = new HyperGeometry(
   shape.vertices,
   shape.faces,
@@ -91,11 +95,13 @@ const hyperGeometry = new HyperGeometry(
 )
 const materials = shape.cells.map((_, i) => {
   const material = new MeshLambertMaterial()
-  material.transparent = true
+  material.transparent = !false
   material.opacity = 0.25
-  material.blending = NormalBlending
+  material.blending = CustomBlending
   material.side = DoubleSide
   material.depthWrite = false
+  // material.depthTest = false
+  // material.premultipliedAlpha = true
   material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
   return material
 })
@@ -109,10 +115,9 @@ const hyperEdgesGeometry = new HyperEdgeGeometry(hyperGeometry, hyperRenderer)
 
 const edgeMaterials = shape.cells.map((_, i) => {
   const material = new LineBasicMaterial()
-  material.opacity = 0.1
+  material.opacity = 0.01
   material.transparent = true
   material.blending = AdditiveBlending
-  material.side = DoubleSide
   material.depthWrite = false
   material.linewidth = 1
   material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
@@ -123,6 +128,25 @@ hyperEdges.cellSize = cellSize
 hyperEdges.scale.setScalar(scale)
 hyperEdges.visible = showEdges
 scene.add(hyperEdges)
+// const hyperEdgesGeometry = new HyperEdgeGeometryMergedEdges(
+//   hyperGeometry,
+//   hyperRenderer
+// )
+
+// const edgeMaterials = new LineBasicMaterial()
+// edgeMaterials.opacity = 0.1
+// edgeMaterials.transparent = true
+// edgeMaterials.blending = AdditiveBlending
+// edgeMaterials.side = DoubleSide
+// edgeMaterials.depthWrite = false
+// edgeMaterials.linewidth = 1
+// edgeMaterials.color = new Color(lotsofcolors[0 % (lotsofcolors.length - 1)])
+
+// hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
+// hyperEdges.cellSize = cellSize
+// hyperEdges.scale.setScalar(scale)
+// hyperEdges.visible = showEdges
+// scene.add(hyperEdges)
 
 const hyperPointsGeometry = new HyperPointsGeometry(
   hyperGeometry,

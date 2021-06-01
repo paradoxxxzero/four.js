@@ -3,16 +3,21 @@ import { BufferAttribute, BufferGeometry, DynamicDrawUsage } from 'three'
 export default class HyperGeometry {
   constructor(vertices, faces, cells, hyperRenderer) {
     this.hyperRenderer = hyperRenderer
-    this.vertices4 = vertices
-    this.vertices = this.vertices4.map(
+    this.hyperVertices = vertices
+    this.vertices = vertices.map(
       this.hyperRenderer.project.bind(this.hyperRenderer)
     )
     this.faces = faces
     this.cells = cells
+    this.init()
+  }
+
+  init() {
+    this.vertexGeometriesIndices = []
 
     this.geometries = this.cells.map(cell => {
       const faces = cell.map(faceIndex => this.faces[faceIndex])
-
+      this.vertexGeometriesIndices.push(faces.flat())
       const verticesCount = faces.reduce((sum, face) => sum + face.length, 0)
 
       const positions = new Float32Array(verticesCount * 3)
@@ -21,7 +26,7 @@ export default class HyperGeometry {
       let pos = 0
       let faceShift = 0
       faces.forEach(face => {
-        // Project points
+        // Set vertices
         face
           .map(verticeIndex => this.vertices[verticeIndex])
           .forEach(([x, y, z]) => {
@@ -50,24 +55,18 @@ export default class HyperGeometry {
   }
 
   update() {
-    this.vertices = this.vertices4.map(
+    this.vertices = this.hyperVertices.map(
       this.hyperRenderer.project.bind(this.hyperRenderer)
     )
-    this.cells.map((cell, cellIndex) => {
-      const geometry = this.geometries[cellIndex]
+    this.vertexGeometriesIndices.map((vertexIndices, i) => {
+      const geometry = this.geometries[i]
 
-      let pos = 0
-      cell
-        .map(faceIndex => this.faces[faceIndex])
-        .forEach(face => {
-          face
-            .map(verticeIndex => this.vertices[verticeIndex])
-            .forEach(([x, y, z]) => {
-              geometry.attributes.position.array[pos++] = x
-              geometry.attributes.position.array[pos++] = y
-              geometry.attributes.position.array[pos++] = z
-            })
-        })
+      for (let i = 0, n = vertexIndices.length; i < n; i++) {
+        const [x, y, z] = this.vertices[vertexIndices[i]]
+        geometry.attributes.position.array[i * 3] = x
+        geometry.attributes.position.array[i * 3 + 1] = y
+        geometry.attributes.position.array[i * 3 + 2] = z
+      }
 
       geometry.attributes.position.needsUpdate = true
       geometry.computeVertexNormals()

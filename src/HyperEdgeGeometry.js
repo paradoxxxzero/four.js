@@ -4,32 +4,34 @@ export default class HyperEdgeGeometry {
   constructor(hyperGeometry, hyperRenderer) {
     this.hyperGeometry = hyperGeometry
     this.hyperRenderer = hyperRenderer
-    const { vertices, faces, cells } = this.hyperGeometry
+    const { vertices, faces: gFaces, cells } = this.hyperGeometry
 
+    this.vertexGeometriesIndices = []
     this.geometries = cells.map(cell => {
-      const cell_faces = cell.map(faceIndex => faces[faceIndex])
+      const faces = cell.map(faceIndex => gFaces[faceIndex])
+      const verticesIndices = [...new Set(faces.flat())]
+      this.vertexGeometriesIndices.push(verticesIndices)
+      const positions = new Float32Array(verticesIndices.length * 3)
 
-      const verticesCount = cell_faces.reduce(
-        (sum, face) => sum + face.length * 2,
-        0
-      )
-
-      const positions = new Float32Array(verticesCount * 3)
-
+      // Set vertices
       let pos = 0
-      cell_faces.forEach(face => {
-        // Project points
-        face
-          .map((verticeIndex, i) => [
-            vertices[verticeIndex],
-            vertices[face[(i + 1) % face.length]],
-          ])
-          .flat()
-          .forEach(([x, y, z]) => {
-            positions[pos++] = x
-            positions[pos++] = y
-            positions[pos++] = z
-          })
+      verticesIndices
+        .map(verticeIndex => vertices[verticeIndex])
+        .forEach(([x, y, z]) => {
+          positions[pos++] = x
+          positions[pos++] = y
+          positions[pos++] = z
+        })
+
+      // Set edges
+      const indices = []
+      faces.forEach(face => {
+        face.forEach((verticeIndex, i) => {
+          indices.push(
+            verticesIndices.indexOf(verticeIndex),
+            verticesIndices.indexOf(face[(i + 1) % face.length])
+          )
+        })
       })
 
       const geometry = new BufferGeometry()
@@ -37,32 +39,22 @@ export default class HyperEdgeGeometry {
         'position',
         new BufferAttribute(positions, 3).setUsage(DynamicDrawUsage)
       )
+      geometry.setIndex(indices)
       return geometry
     })
   }
 
   update() {
-    const { vertices, faces, cells } = this.hyperGeometry
+    const { vertices } = this.hyperGeometry
+    this.vertexGeometriesIndices.map((vertexIndices, i) => {
+      const geometry = this.geometries[i]
 
-    cells.map((cell, cellIndex) => {
-      const geometry = this.geometries[cellIndex]
-
-      let pos = 0
-      cell
-        .map(faceIndex => faces[faceIndex])
-        .forEach(face => {
-          face
-            .map((verticeIndex, i) => [
-              vertices[verticeIndex],
-              vertices[face[(i + 1) % face.length]],
-            ])
-            .flat()
-            .forEach(([x, y, z]) => {
-              geometry.attributes.position.array[pos++] = x
-              geometry.attributes.position.array[pos++] = y
-              geometry.attributes.position.array[pos++] = z
-            })
-        })
+      for (let i = 0, n = vertexIndices.length; i < n; i++) {
+        const [x, y, z] = vertices[vertexIndices[i]]
+        geometry.attributes.position.array[i * 3] = x
+        geometry.attributes.position.array[i * 3 + 1] = y
+        geometry.attributes.position.array[i * 3 + 2] = z
+      }
 
       geometry.attributes.position.needsUpdate = true
     })

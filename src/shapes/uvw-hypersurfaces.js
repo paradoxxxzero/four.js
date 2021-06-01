@@ -79,7 +79,7 @@ export const generateGlome = r =>
       r * Math.sin(u) * Math.sin(v) * Math.cos(w),
       r * Math.sin(u) * Math.sin(v) * Math.sin(w),
     ],
-    [0, Math.PI, 8, true],
+    [0, Math.PI, 16, true],
     [0, 2 * Math.PI, 16],
     [0, 2 * Math.PI, 16]
   )
@@ -94,7 +94,7 @@ export const generateDiTorus = (r1, r2, r3) =>
       (r3 + (r2 + r1 * Math.sin(u)) * Math.sin(v)) * Math.cos(w),
       (r3 + (r2 + r1 * Math.sin(u)) * Math.sin(v)) * Math.sin(w),
     ],
-    [0, Math.PI, 8, true],
+    [0, Math.PI, 16, true],
     [0, 2 * Math.PI, 16],
     [0, 2 * Math.PI, 16]
   )

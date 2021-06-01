@@ -1,35 +1,42 @@
 import { BufferAttribute, BufferGeometry, DynamicDrawUsage } from 'three'
 
-export default class HyperPointsGeometry {
+export default class HyperEdgeGeometryMergedEdges {
   constructor(hyperGeometry, hyperRenderer) {
     this.hyperGeometry = hyperGeometry
     this.hyperRenderer = hyperRenderer
     const { vertices, faces: gFaces, cells } = this.hyperGeometry
 
     this.vertexGeometriesIndices = []
-    this.geometries = cells.map(cell => {
+    const verticesIndices = new Array(vertices.length).fill().map((_, i) => i)
+    const positions = new Float32Array(verticesIndices.length * 3)
+
+    let pos = 0
+    verticesIndices
+      .map(verticeIndex => vertices[verticeIndex])
+      .forEach(([x, y, z]) => {
+        positions[pos++] = x
+        positions[pos++] = y
+        positions[pos++] = z
+      })
+    this.vertexGeometriesIndices.push(verticesIndices)
+    const indices = []
+    cells.map(cell => {
       const faces = cell.map(faceIndex => gFaces[faceIndex])
-      const verticesIndices = [...new Set(faces.flat())]
-      this.vertexGeometriesIndices.push(verticesIndices)
-      const positions = new Float32Array(verticesIndices.length * 3)
 
-      // Set vertices
-      let pos = 0
-      verticesIndices
-        .map(verticeIndex => vertices[verticeIndex])
-        .forEach(([x, y, z]) => {
-          positions[pos++] = x
-          positions[pos++] = y
-          positions[pos++] = z
+      // Set edges
+      faces.forEach(face => {
+        face.forEach((verticeIndex, i) => {
+          indices.push(verticeIndex, face[(i + 1) % face.length])
         })
-
-      const geometry = new BufferGeometry()
-      geometry.setAttribute(
-        'position',
-        new BufferAttribute(positions, 3).setUsage(DynamicDrawUsage)
-      )
-      return geometry
+      })
     })
+    const geometry = new BufferGeometry()
+    geometry.setAttribute(
+      'position',
+      new BufferAttribute(positions, 3).setUsage(DynamicDrawUsage)
+    )
+    geometry.setIndex(indices)
+    this.geometries = [geometry]
   }
 
   update() {
