@@ -16,11 +16,15 @@ import {
   ShaderMaterial,
   PointsMaterial,
   Points,
+  BufferGeometry,
+  BufferAttribute,
+  DynamicDrawUsage,
+  Mesh,
+  MeshPhongMaterial,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'stats.js'
 
-import disc from './disc.png'
 import {
   HyperMesh,
   HyperGeometry,
@@ -28,10 +32,13 @@ import {
   HyperEdgesGeometry,
   HyperGeometryMergedVertices,
   HyperEdgesGeometryMergedEdges,
+  HyperSlicePointsGeometry,
+  HyperSliceEdgesGeometry,
+  HyperSliceGeometry,
   HyperPointsGeometry,
 } from 'four-js'
 
-import { hecatonicosachoronTruncated as shape } from '../src/shapes'
+import { hecatonicosachoronRuncinated as shape } from '../src/shapes'
 // import { default as shape } from '../src/shapes/uvw-hypersurfaces'
 // import { generateUVSurface } from '../src/shapes/uv-surfaces'
 // const shape = generateUVSurface(
@@ -45,10 +52,17 @@ import { hecatonicosachoronTruncated as shape } from '../src/shapes'
 //   [0, 2 * Math.PI, 32, true]
 // )
 
-const scale = 2
-const showFaces = true
-const showEdges = true
+const ws = shape.vertices.map(([, , , w]) => w)
+const wmin = Math.min(...ws)
+const wmax = Math.max(...ws)
+
+const scale = 8
+const showFaces = !true
+const showEdges = !true
 const showPoints = !true
+const showSliceFaces = true
+const showSliceEdges = true
+const showSlicePoints = !true
 const stats = new Stats()
 const scene = new Scene()
 const cellSize = 100
@@ -96,7 +110,7 @@ const hyperGeometry = new HyperGeometryMergedVertices(
 const materials = shape.cells.map((_, i) => {
   const material = new MeshLambertMaterial()
   material.transparent = !false
-  material.opacity = 0.25
+  material.opacity = 0.15
   material.blending = CustomBlending
   material.side = DoubleSide
   material.depthWrite = false
@@ -201,13 +215,89 @@ hyperPoints.scale.setScalar(scale)
 hyperPoints.visible = showPoints
 scene.add(hyperPoints)
 
+const slicePointsMaterial = new ShaderMaterial({
+  uniforms: {
+    size: { value: 15 },
+    opacity: { value: 0.5 },
+    color: { value: new Color(0xffff00) },
+  },
+  vertexShader: `uniform float size;
+  
+  void main() {
+  
+    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+  
+    gl_PointSize = size * ( 10.0 / - mvPosition.z );
+  
+    gl_Position = projectionMatrix * mvPosition;
+  }`,
+  fragmentShader: `
+  uniform vec3 color;
+  uniform float opacity;
+
+    void main() {
+    
+      if (length(gl_PointCoord - vec2( 0.5, 0.5 )) > 0.475) discard;
+    
+      gl_FragColor = vec4(color, opacity );
+    } `,
+})
+slicePointsMaterial.transparent = true
+slicePointsMaterial.depthWrite = false
+
+const slicesPoints = new HyperSlicePointsGeometry(shape, hyperRenderer)
+
+const slicesPointsMesh = new Points(slicesPoints.geometry, slicePointsMaterial)
+slicesPointsMesh.visible = showSlicePoints
+slicesPointsMesh.scale.setScalar(scale)
+scene.add(slicesPointsMesh)
+
+const slicesEdges = new HyperSliceEdgesGeometry(shape, hyperRenderer)
+
+const sliceEdgesMaterial = new LineBasicMaterial()
+sliceEdgesMaterial.opacity = 0.5
+sliceEdgesMaterial.transparent = true
+sliceEdgesMaterial.blending = AdditiveBlending
+sliceEdgesMaterial.depthWrite = false
+sliceEdgesMaterial.linewidth = 5
+sliceEdgesMaterial.color = new Color(0xff00ff)
+
+const slicesEdgesMesh = new LineSegments(
+  slicesEdges.geometry,
+  sliceEdgesMaterial
+)
+slicesEdgesMesh.visible = showSliceEdges
+slicesEdgesMesh.scale.setScalar(scale)
+scene.add(slicesEdgesMesh)
+
+const slices = new HyperSliceGeometry(shape, hyperRenderer)
+
+const sliceMaterial = new MeshPhongMaterial()
+sliceMaterial.opacity = 1
+sliceMaterial.transparent = !true
+sliceMaterial.shininess = 50
+// sliceMaterial.blending = CustomBlending
+// sliceMaterial.depthWrite = false
+sliceMaterial.side = DoubleSide
+sliceMaterial.color = new Color(0x00ffff)
+
+const slicesMesh = new Mesh(slices.geometry, sliceMaterial)
+slicesMesh.visible = showSliceFaces
+slicesMesh.scale.setScalar(scale)
+
+scene.add(slicesMesh)
+
 function render() {
   stats.update()
   requestAnimationFrame(render)
-  hyperRenderer.rotate({ xy: 0, xz: 0, xw: 5, yz: 0, yw: 10, zw: 10 })
+  // hyperRenderer.rotate({ xy: 2, xz: 2, xw: 2, yz: 2, yw: 2, zw: 2 })
+  hyperRenderer.shiftSlice(1, wmin, wmax)
   hyperMesh.update()
   showEdges && hyperEdges.update()
   showPoints && hyperPoints.update()
+  showSliceFaces && slices.update()
+  showSliceEdges && slicesEdges.update()
+  showSlicePoints && slicesPoints.update()
   renderer.render(scene, camera)
 }
 
