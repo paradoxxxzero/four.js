@@ -38,7 +38,7 @@ import {
   HyperPointsGeometry,
 } from 'four-js'
 
-import { hecatonicosachoronRuncinated as shape } from '../src/shapes'
+import { hecatonicosachoron as shape } from '../src/shapes'
 // import { default as shape } from '../src/shapes/uvw-hypersurfaces'
 // import { generateUVSurface } from '../src/shapes/uv-surfaces'
 // const shape = generateUVSurface(
@@ -56,7 +56,7 @@ const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
-const scale = 8
+const scale = 1
 const showFaces = !true
 const showEdges = !true
 const showPoints = !true
@@ -95,8 +95,7 @@ scene.add(new AmbientLight(0x222222))
 camera.add(new PointLight(0xffffff, 1))
 
 // prettier-ignore
-const lotsofcolors = ['#e06c75', '#98c379', '#d19a66', '#61afef', '#c678dd', '#56b6c2', '#ffffff', '#ff6188', '#a9dc76', '#ffd866', '#fc9867', '#ab9df2', '#78dce8', '#fcfcfa', '#705050', '#60b48a', '#dfaf8f', '#506070', '#dc8cc3', '#8cd0d3', '#dcdccc', '#709080', '#dca3a3', '#c3bf9f', '#f0dfaf', '#94bff3', '#ec93d3', '#93e0e3', '#263238', '#ff9800', '#8bc34a', '#ffc107', '#03a9f4', '#e91e63', '#009688', '#cfd8dc', '#37474f', '#ffa74d', '#9ccc65', '#ffa000', '#81d4fa', '#ad1457', '#26a69a', '#eceff1']
-
+const lotsofcolors = new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360}, 40%, 50%)`)
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
 let hyperMesh, hyperEdges, hyperPoints
@@ -255,12 +254,12 @@ scene.add(slicesPointsMesh)
 const slicesEdges = new HyperSliceEdgesGeometry(shape, hyperRenderer)
 
 const sliceEdgesMaterial = new LineBasicMaterial()
-sliceEdgesMaterial.opacity = 0.5
-sliceEdgesMaterial.transparent = true
-sliceEdgesMaterial.blending = AdditiveBlending
-sliceEdgesMaterial.depthWrite = false
-sliceEdgesMaterial.linewidth = 5
-sliceEdgesMaterial.color = new Color(0xff00ff)
+// sliceEdgesMaterial.opacity = 0.5
+// sliceEdgesMaterial.transparent = true
+// sliceEdgesMaterial.blending = AdditiveBlending
+// sliceEdgesMaterial.depthWrite = false
+sliceEdgesMaterial.linewidth = 2
+sliceEdgesMaterial.color = new Color(0xffffff)
 
 const slicesEdgesMesh = new LineSegments(
   slicesEdges.geometry,
@@ -270,16 +269,17 @@ slicesEdgesMesh.visible = showSliceEdges
 slicesEdgesMesh.scale.setScalar(scale)
 scene.add(slicesEdgesMesh)
 
-const slices = new HyperSliceGeometry(shape, hyperRenderer)
+const slices = new HyperSliceGeometry(shape, hyperRenderer, lotsofcolors)
 
 const sliceMaterial = new MeshPhongMaterial()
-sliceMaterial.opacity = 1
-sliceMaterial.transparent = !true
+// sliceMaterial.opacity = 0.75
+// sliceMaterial.transparent = true
 sliceMaterial.shininess = 50
+sliceMaterial.vertexColors = true
 // sliceMaterial.blending = CustomBlending
 // sliceMaterial.depthWrite = false
 sliceMaterial.side = DoubleSide
-sliceMaterial.color = new Color(0x00ffff)
+// sliceMaterial.color = new Color(0xffffff)
 
 const slicesMesh = new Mesh(slices.geometry, sliceMaterial)
 slicesMesh.visible = showSliceFaces
@@ -291,7 +291,7 @@ function render() {
   stats.update()
   requestAnimationFrame(render)
   // hyperRenderer.rotate({ xy: 2, xz: 2, xw: 2, yz: 2, yw: 2, zw: 2 })
-  hyperRenderer.shiftSlice(1, wmin, wmax)
+  hyperRenderer.shiftSlice(0.25, wmin, wmax)
   hyperMesh.update()
   showEdges && hyperEdges.update()
   showPoints && hyperPoints.update()
