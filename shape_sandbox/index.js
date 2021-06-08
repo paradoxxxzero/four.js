@@ -32,13 +32,11 @@ import {
   HyperEdgesGeometry,
   HyperGeometryMergedVertices,
   HyperEdgesGeometryMergedEdges,
-  HyperSlicePointsGeometry,
-  HyperSliceEdgesGeometry,
   HyperSliceGeometry,
   HyperPointsGeometry,
 } from 'four-js'
 
-import { hecatonicosachoron as shape } from '../src/shapes'
+import { permutahedronF as shape } from '../src/shapes'
 // import { default as shape } from '../src/shapes/uvw-hypersurfaces'
 // import { generateUVSurface } from '../src/shapes/uv-surfaces'
 // const shape = generateUVSurface(
@@ -56,13 +54,13 @@ const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
-const scale = 1
+const scale = 5
 const showFaces = !true
 const showEdges = !true
 const showPoints = !true
 const showSliceFaces = true
 const showSliceEdges = true
-const showSlicePoints = !true
+const showSlicePoints = true
 const stats = new Stats()
 const scene = new Scene()
 const cellSize = 100
@@ -216,14 +214,15 @@ scene.add(hyperPoints)
 
 const slicePointsMaterial = new ShaderMaterial({
   uniforms: {
-    size: { value: 15 },
-    opacity: { value: 0.5 },
-    color: { value: new Color(0xffff00) },
+    size: { value: 5 },
+    opacity: { value: 0.25 },
   },
   vertexShader: `uniform float size;
-  
+  attribute vec3 color;
+  varying vec3 vColor;
+
   void main() {
-  
+    vColor = color;
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
   
     gl_PointSize = size * ( 10.0 / - mvPosition.z );
@@ -231,45 +230,28 @@ const slicePointsMaterial = new ShaderMaterial({
     gl_Position = projectionMatrix * mvPosition;
   }`,
   fragmentShader: `
-  uniform vec3 color;
   uniform float opacity;
+  varying vec3 vColor;
 
     void main() {
     
       if (length(gl_PointCoord - vec2( 0.5, 0.5 )) > 0.475) discard;
     
-      gl_FragColor = vec4(color, opacity );
+      gl_FragColor = vec4(vColor, opacity );
     } `,
 })
 slicePointsMaterial.transparent = true
+slicePointsMaterial.opacity = 0.15
+slicePointsMaterial.blending = AdditiveBlending
 slicePointsMaterial.depthWrite = false
 
-const slicesPoints = new HyperSlicePointsGeometry(shape, hyperRenderer)
-
-const slicesPointsMesh = new Points(slicesPoints.geometry, slicePointsMaterial)
-slicesPointsMesh.visible = showSlicePoints
-slicesPointsMesh.scale.setScalar(scale)
-scene.add(slicesPointsMesh)
-
-const slicesEdges = new HyperSliceEdgesGeometry(shape, hyperRenderer)
-
 const sliceEdgesMaterial = new LineBasicMaterial()
-// sliceEdgesMaterial.opacity = 0.5
-// sliceEdgesMaterial.transparent = true
-// sliceEdgesMaterial.blending = AdditiveBlending
+sliceEdgesMaterial.opacity = 0.5
+sliceEdgesMaterial.transparent = true
+sliceEdgesMaterial.blending = AdditiveBlending
 // sliceEdgesMaterial.depthWrite = false
-sliceEdgesMaterial.linewidth = 2
-sliceEdgesMaterial.color = new Color(0xffffff)
-
-const slicesEdgesMesh = new LineSegments(
-  slicesEdges.geometry,
-  sliceEdgesMaterial
-)
-slicesEdgesMesh.visible = showSliceEdges
-slicesEdgesMesh.scale.setScalar(scale)
-scene.add(slicesEdgesMesh)
-
-const slices = new HyperSliceGeometry(shape, hyperRenderer, lotsofcolors)
+sliceEdgesMaterial.linewidth = 5
+sliceEdgesMaterial.vertexColors = true
 
 const sliceMaterial = new MeshPhongMaterial()
 // sliceMaterial.opacity = 0.75
@@ -280,6 +262,27 @@ sliceMaterial.vertexColors = true
 // sliceMaterial.depthWrite = false
 sliceMaterial.side = DoubleSide
 // sliceMaterial.color = new Color(0xffffff)
+
+const slices = new HyperSliceGeometry(shape, hyperRenderer, {
+  useColors: true,
+  useFaces: showSliceFaces,
+  useEdges: showSliceEdges,
+  usePoints: showSlicePoints,
+  colors: lotsofcolors,
+})
+
+const slicesPointsMesh = new Points(slices.pointGeometry, slicePointsMaterial)
+slicesPointsMesh.visible = showSlicePoints
+slicesPointsMesh.scale.setScalar(scale)
+scene.add(slicesPointsMesh)
+
+const slicesEdgesMesh = new LineSegments(
+  slices.edgeGeometry,
+  sliceEdgesMaterial
+)
+slicesEdgesMesh.visible = showSliceEdges
+slicesEdgesMesh.scale.setScalar(scale)
+scene.add(slicesEdgesMesh)
 
 const slicesMesh = new Mesh(slices.geometry, sliceMaterial)
 slicesMesh.visible = showSliceFaces
@@ -295,9 +298,7 @@ function render() {
   hyperMesh.update()
   showEdges && hyperEdges.update()
   showPoints && hyperPoints.update()
-  showSliceFaces && slices.update()
-  showSliceEdges && slicesEdges.update()
-  showSlicePoints && slicesPoints.update()
+  ;(showSliceFaces || showSliceEdges || showSlicePoints) && slices.update()
   renderer.render(scene, camera)
 }
 

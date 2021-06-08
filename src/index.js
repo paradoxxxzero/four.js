@@ -5,8 +5,6 @@ import HyperEdgesGeometryMergedEdges from './HyperEdgesGeometryMergedEdges'
 import HyperMesh from './HyperMesh'
 import HyperPointsGeometry from './HyperPointsGeometry'
 import HyperRenderer from './HyperRenderer'
-import HyperSlicePointsGeometry from './HyperSlicePointsGeometry'
-import HyperSliceEdgesGeometry from './HyperSliceEdgesGeometry'
 import HyperSliceGeometry from './HyperSliceGeometry'
 import * as shapes from './shapes'
 
@@ -18,8 +16,6 @@ export {
   HyperPointsGeometry,
   HyperGeometryMergedVertices,
   HyperEdgesGeometryMergedEdges,
-  HyperSlicePointsGeometry,
-  HyperSliceEdgesGeometry,
   HyperSliceGeometry,
   shapes,
 }
