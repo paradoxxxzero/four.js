@@ -2,19 +2,21 @@ import { BufferAttribute, BufferGeometry, DynamicDrawUsage, Color } from 'three'
 
 export default class HyperSliceGeometry {
   constructor(
-    hyperGeometry,
+    shape,
     hyperRenderer,
     {
       useColors = false,
       useFaces = true,
       useEdges = false,
       usePoints = false,
-      colors = [0xffff00],
-    }
+      colors = [
+        new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360}, 60%, 60%)`),
+      ],
+    } = {}
   ) {
-    this.hyperGeometry = hyperGeometry
+    this.shape = shape
     this.hyperRenderer = hyperRenderer
-    const { cells } = this.hyperGeometry
+    const { cells } = this.shape
     this.useColors = useColors
     this.useFaces = useFaces
     this.useEdges = useEdges
@@ -23,13 +25,17 @@ export default class HyperSliceGeometry {
 
     const maxPositions = 2 * cells.reduce((rv, c) => rv + c.length, 0)
 
-    this.geometry = this.initGeometry(maxPositions)
+    if (this.useFaces) {
+      this.geometry = this.initGeometry(maxPositions)
+    }
     if (this.useEdges) {
       this.edgeGeometry = this.initGeometry(maxPositions)
     }
     if (this.usePoints) {
       this.pointGeometry = this.initGeometry(maxPositions)
     }
+
+    this.update()
   }
 
   initGeometry(size) {
@@ -40,7 +46,7 @@ export default class HyperSliceGeometry {
         DynamicDrawUsage
       )
     )
-    if (this.colors) {
+    if (this.useColors) {
       geometry.setAttribute(
         'color',
         new BufferAttribute(new Float32Array(3 * size), 3).setUsage(
@@ -52,7 +58,7 @@ export default class HyperSliceGeometry {
   }
 
   update() {
-    const { vertices, faces, cells } = this.hyperGeometry
+    const { vertices, faces, cells } = this.shape
     const epsilon = 1e-8
     let i = 0
     const indices = []

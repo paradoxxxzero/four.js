@@ -4,7 +4,7 @@ export default class HyperEdgesGeometryMergedEdges {
   constructor(hyperGeometry, hyperRenderer) {
     this.hyperGeometry = hyperGeometry
     this.hyperRenderer = hyperRenderer
-    const { vertices, faces: gFaces, cells } = this.hyperGeometry
+    const { vertices, faces: gFaces, cells } = this.hyperGeometry.shape
 
     this.vertexGeometriesIndices = []
     const verticesIndices = new Array(vertices.length).fill().map((_, i) => i)

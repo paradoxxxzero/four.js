@@ -36,7 +36,7 @@ import {
   HyperPointsGeometry,
 } from 'four-js'
 
-import { permutahedronF as shape } from '../src/shapes'
+import { tesseract as shape } from '../src/shapes'
 // import { default as shape } from '../src/shapes/uvw-hypersurfaces'
 // import { generateUVSurface } from '../src/shapes/uv-surfaces'
 // const shape = generateUVSurface(
@@ -54,13 +54,13 @@ const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
-const scale = 5
+const scale = 1
 const showFaces = !true
 const showEdges = !true
 const showPoints = !true
 const showSliceFaces = true
 const showSliceEdges = true
-const showSlicePoints = true
+const showSlicePoints = !true
 const stats = new Stats()
 const scene = new Scene()
 const cellSize = 100
@@ -93,175 +93,92 @@ scene.add(new AmbientLight(0x222222))
 camera.add(new PointLight(0xffffff, 1))
 
 // prettier-ignore
-const lotsofcolors = new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360}, 40%, 50%)`)
+const lotsofcolors = new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360}, 60%, 60%)`)
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
-let hyperMesh, hyperEdges, hyperPoints
-const hyperGeometry = new HyperGeometryMergedVertices(
-  // const hyperGeometry = new HyperGeometry(
-  shape.vertices,
-  shape.faces,
-  shape.cells,
-  hyperRenderer
-)
-const materials = shape.cells.map((_, i) => {
-  const material = new MeshLambertMaterial()
-  material.transparent = !false
-  material.opacity = 0.15
-  material.blending = CustomBlending
-  material.side = DoubleSide
-  material.depthWrite = false
-  // material.depthTest = false
-  // material.premultipliedAlpha = true
-  material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
-  return material
-})
-hyperMesh = new HyperMesh(hyperGeometry, materials)
-hyperMesh.cellSize = cellSize
-hyperMesh.scale.setScalar(scale)
-hyperMesh.visible = showFaces
-scene.add(hyperMesh)
+const material = new MeshPhongMaterial()
+// material.transparent = !false
+// material.opacity = 0.75
+// material.blending = CustomBlending
+// material.depthWrite = false
+material.side = DoubleSide
+material.vertexColors = true
 
-const hyperEdgesGeometry = new HyperEdgesGeometry(hyperGeometry, hyperRenderer)
+const edgesMaterial = new LineBasicMaterial()
+// edgesMaterial.opacity = 0.1
+// edgesMaterial.transparent = true
+// edgesMaterial.depthWrite = false
+// edgesMaterial.blending = AdditiveBlending
+edgesMaterial.linewidth = 2
+edgesMaterial.vertexColors = false
+edgesMaterial.color = new Color(0xffffff)
 
-const edgeMaterials = shape.cells.map((_, i) => {
-  const material = new LineBasicMaterial()
-  material.opacity = 0.1
-  material.transparent = true
-  material.blending = AdditiveBlending
-  material.depthWrite = false
-  material.linewidth = 1
-  material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
-  return material
-})
-hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
-hyperEdges.cellSize = cellSize
-hyperEdges.scale.setScalar(scale)
-hyperEdges.visible = showEdges
-scene.add(hyperEdges)
-// const hyperEdgesGeometry = new HyperEdgesGeometryMergedEdges(
-//   hyperGeometry,
-//   hyperRenderer
-// )
-
-// const edgeMaterials = new LineBasicMaterial()
-// edgeMaterials.opacity = 0.1
-// edgeMaterials.transparent = true
-// edgeMaterials.blending = AdditiveBlending
-// edgeMaterials.side = DoubleSide
-// edgeMaterials.depthWrite = false
-// edgeMaterials.linewidth = 1
-// edgeMaterials.color = new Color(lotsofcolors[0 % (lotsofcolors.length - 1)])
-
-// hyperEdges = new HyperMesh(hyperEdgesGeometry, edgeMaterials, LineSegments)
-// hyperEdges.cellSize = cellSize
-// hyperEdges.scale.setScalar(scale)
-// hyperEdges.visible = showEdges
-// scene.add(hyperEdges)
-
-const hyperPointsGeometry = new HyperPointsGeometry(
-  hyperGeometry,
-  hyperRenderer
-)
-
-// const DOT = new TextureLoader().load(disc)
-// const pointsMaterials = shape.cells.map((_, i) => {
-//   const material = new PointsMaterial()
-//   material.map = DOT
-//   material.size = 0.25
-//   material.alphaTest = 0.5
-//   material.color = new Color(lotsofcolors[i % (lotsofcolors.length - 1)])
-
-//   return material
-// })
-const pointsMaterials = shape.cells.map((_, i) => {
-  const material = new ShaderMaterial({
-    uniforms: {
-      size: { value: 5 },
-      opacity: { value: 0.5 },
-      color: { value: new Color(lotsofcolors[i % (lotsofcolors.length - 1)]) },
-    },
-    vertexShader: `uniform float size;
-    
+const pointsMaterial = new ShaderMaterial({
+  uniforms: {
+    size: { value: 5 },
+    opacity: { value: 0.25 },
+  },
+  vertexShader: `uniform float size;
+    attribute vec3 color;
+    varying vec3 vColor;
+  
     void main() {
-    
+      vColor = color;
       vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
     
       gl_PointSize = size * ( 10.0 / - mvPosition.z );
     
       gl_Position = projectionMatrix * mvPosition;
     }`,
-    fragmentShader: `
-    uniform vec3 color;
+  fragmentShader: `
     uniform float opacity;
-
+    varying vec3 vColor;
+  
       void main() {
       
         if (length(gl_PointCoord - vec2( 0.5, 0.5 )) > 0.475) discard;
       
-        gl_FragColor = vec4(color, opacity );
+        gl_FragColor = vec4(vColor, opacity );
       } `,
-  })
-  material.transparent = true
-  material.depthWrite = false
-  return material
 })
-hyperPoints = new HyperMesh(hyperPointsGeometry, pointsMaterials, Points)
+pointsMaterial.transparent = true
+pointsMaterial.depthWrite = false
+
+const hyperGeometry = new HyperGeometry(shape, hyperRenderer, {
+  useColors: true,
+  useFaces: true,
+  useEdges: true,
+  usePoints: true,
+  useFaceColors: true,
+  useDepthEdgeColors: true,
+  colors: lotsofcolors,
+})
+
+const hyperMesh = new HyperMesh(hyperGeometry.geometries, material)
+hyperMesh.cellSize = cellSize
+hyperMesh.scale.setScalar(scale)
+hyperMesh.visible = showFaces
+scene.add(hyperMesh)
+
+const hyperEdges = new HyperMesh(
+  hyperGeometry.edgesGeometries,
+  edgesMaterial,
+  LineSegments
+)
+hyperEdges.cellSize = cellSize
+hyperEdges.scale.setScalar(scale)
+hyperEdges.visible = showEdges
+scene.add(hyperEdges)
+
+const hyperPoints = new HyperMesh(
+  hyperGeometry.pointsGeometries,
+  pointsMaterial,
+  Points
+)
 hyperPoints.cellSize = cellSize
 hyperPoints.scale.setScalar(scale)
 hyperPoints.visible = showPoints
 scene.add(hyperPoints)
-
-const slicePointsMaterial = new ShaderMaterial({
-  uniforms: {
-    size: { value: 5 },
-    opacity: { value: 0.25 },
-  },
-  vertexShader: `uniform float size;
-  attribute vec3 color;
-  varying vec3 vColor;
-
-  void main() {
-    vColor = color;
-    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-  
-    gl_PointSize = size * ( 10.0 / - mvPosition.z );
-  
-    gl_Position = projectionMatrix * mvPosition;
-  }`,
-  fragmentShader: `
-  uniform float opacity;
-  varying vec3 vColor;
-
-    void main() {
-    
-      if (length(gl_PointCoord - vec2( 0.5, 0.5 )) > 0.475) discard;
-    
-      gl_FragColor = vec4(vColor, opacity );
-    } `,
-})
-slicePointsMaterial.transparent = true
-slicePointsMaterial.opacity = 0.15
-slicePointsMaterial.blending = AdditiveBlending
-slicePointsMaterial.depthWrite = false
-
-const sliceEdgesMaterial = new LineBasicMaterial()
-sliceEdgesMaterial.opacity = 0.5
-sliceEdgesMaterial.transparent = true
-sliceEdgesMaterial.blending = AdditiveBlending
-// sliceEdgesMaterial.depthWrite = false
-sliceEdgesMaterial.linewidth = 5
-sliceEdgesMaterial.vertexColors = true
-
-const sliceMaterial = new MeshPhongMaterial()
-// sliceMaterial.opacity = 0.75
-// sliceMaterial.transparent = true
-sliceMaterial.shininess = 50
-sliceMaterial.vertexColors = true
-// sliceMaterial.blending = CustomBlending
-// sliceMaterial.depthWrite = false
-sliceMaterial.side = DoubleSide
-// sliceMaterial.color = new Color(0xffffff)
 
 const slices = new HyperSliceGeometry(shape, hyperRenderer, {
   useColors: true,
@@ -271,20 +188,17 @@ const slices = new HyperSliceGeometry(shape, hyperRenderer, {
   colors: lotsofcolors,
 })
 
-const slicesPointsMesh = new Points(slices.pointGeometry, slicePointsMaterial)
+const slicesPointsMesh = new Points(slices.pointGeometry, pointsMaterial)
 slicesPointsMesh.visible = showSlicePoints
 slicesPointsMesh.scale.setScalar(scale)
 scene.add(slicesPointsMesh)
 
-const slicesEdgesMesh = new LineSegments(
-  slices.edgeGeometry,
-  sliceEdgesMaterial
-)
+const slicesEdgesMesh = new LineSegments(slices.edgeGeometry, edgesMaterial)
 slicesEdgesMesh.visible = showSliceEdges
 slicesEdgesMesh.scale.setScalar(scale)
 scene.add(slicesEdgesMesh)
 
-const slicesMesh = new Mesh(slices.geometry, sliceMaterial)
+const slicesMesh = new Mesh(slices.geometry, material)
 slicesMesh.visible = showSliceFaces
 slicesMesh.scale.setScalar(scale)
 
@@ -293,9 +207,10 @@ scene.add(slicesMesh)
 function render() {
   stats.update()
   requestAnimationFrame(render)
-  // hyperRenderer.rotate({ xy: 2, xz: 2, xw: 2, yz: 2, yw: 2, zw: 2 })
-  hyperRenderer.shiftSlice(0.25, wmin, wmax)
-  hyperMesh.update()
+  hyperRenderer.rotate({ xy: 4, xz: 4, xw: 4, yz: 4, yw: 4, zw: 4 })
+  hyperRenderer.shiftSlice(0.5, wmin, wmax)
+  ;(showFaces || showEdges || showPoints) && hyperGeometry.update()
+  showFaces && hyperMesh.update()
   showEdges && hyperEdges.update()
   showPoints && hyperPoints.update()
   ;(showSliceFaces || showSliceEdges || showSlicePoints) && slices.update()
