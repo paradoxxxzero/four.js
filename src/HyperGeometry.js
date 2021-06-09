@@ -14,6 +14,7 @@ export default class HyperGeometry {
       colors = new Array(128)
         .fill()
         .map((_, i) => `hsl(${(i * 29) % 360}, 60%, 60%)`),
+      flatNormals = true,
     } = {}
   ) {
     this.shape = shape
@@ -24,47 +25,64 @@ export default class HyperGeometry {
     this.usePoints = usePoints
     this.colors = colors.map(color => new Color(color))
     this.colorGenerator = colorGenerator
+    this.flatNormals = flatNormals
 
+    this.fullVertexGeometriesIndices = []
     this.vertexGeometriesIndices = []
-    this.dedupVertexGeometriesIndices = []
     this.shape.cells.map(cell => {
       const faces = cell.map(faceIndex => this.shape.faces[faceIndex])
       const verticesIndices = faces.flat()
-      this.vertexGeometriesIndices.push(verticesIndices)
-      this.dedupVertexGeometriesIndices.push([...new Set(verticesIndices)])
+      this.fullVertexGeometriesIndices.push(verticesIndices)
+      this.vertexGeometriesIndices.push([...new Set(verticesIndices)])
     })
+    this.facesVertexGeometriesIndices = this.flatNormals
+      ? this.fullVertexGeometriesIndices
+      : this.vertexGeometriesIndices
 
     if (this.useFaces) {
-      this.geometries = this.vertexGeometriesIndices.map(verticesIndices =>
+      this.geometries = this.facesVertexGeometriesIndices.map(verticesIndices =>
         this.initGeometry(verticesIndices.length)
       )
-      this.geometries.forEach((geometry, i) => {
-        const faces = this.shape.cells[i].map(
+
+      this.geometries.forEach((geometry, cellIndex) => {
+        const faces = this.shape.cells[cellIndex].map(
           faceIndex => this.shape.faces[faceIndex]
         )
+        const verticesIndices = this.facesVertexGeometriesIndices[cellIndex]
+
         const indices = []
         let faceShift = 0
         faces.forEach(face => {
           // Tesselate face
-          new Array(face.length - 2).fill().forEach((_, i) => {
-            indices.push(faceShift, faceShift + i + 1, faceShift + i + 2)
-          })
+          if (this.flatNormals) {
+            new Array(face.length - 2).fill().forEach((_, i) => {
+              indices.push(faceShift, faceShift + i + 1, faceShift + i + 2)
+            })
 
-          faceShift += face.length
+            faceShift += face.length
+          } else {
+            new Array(face.length - 2).fill().forEach((_, i) => {
+              indices.push(
+                verticesIndices.indexOf(face[0]),
+                verticesIndices.indexOf(face[i + 1]),
+                verticesIndices.indexOf(face[i + 2])
+              )
+            })
+          }
         })
         geometry.setIndex(indices)
       })
     }
 
     if (this.useEdges) {
-      this.edgesGeometries = this.dedupVertexGeometriesIndices.map(
-        verticesIndices => this.initGeometry(verticesIndices.length)
+      this.edgeGeometries = this.vertexGeometriesIndices.map(verticesIndices =>
+        this.initGeometry(verticesIndices.length)
       )
-      this.edgesGeometries.forEach((geometry, i) => {
+      this.edgeGeometries.forEach((geometry, i) => {
         const faces = this.shape.cells[i].map(
           faceIndex => this.shape.faces[faceIndex]
         )
-        const verticesIndices = this.dedupVertexGeometriesIndices[i]
+        const verticesIndices = this.vertexGeometriesIndices[i]
         const indices = []
         faces.forEach(face => {
           face.forEach((verticeIndex, i) => {
@@ -79,8 +97,8 @@ export default class HyperGeometry {
     }
 
     if (this.usePoints) {
-      this.pointsGeometries = this.dedupVertexGeometriesIndices.map(
-        verticesIndices => this.initGeometry(verticesIndices.length)
+      this.pointGeometries = this.vertexGeometriesIndices.map(verticesIndices =>
+        this.initGeometry(verticesIndices.length)
       )
     }
 
@@ -112,44 +130,40 @@ export default class HyperGeometry {
         })
       }
       if (this.useEdges) {
-        this.dedupVertexGeometriesIndices.forEach(
-          (verticesIndex, cellIndex) => {
-            const geometry = this.edgesGeometries[cellIndex]
-            let pos = 0
-            verticesIndex.forEach(verticeIndex => {
-              const [r, g, b] = colorGetter({
-                cell: cellIndex,
-                face: null,
-                vertice: verticeIndex,
-                type: 'edge',
-              }).toArray()
-              geometry.attributes.color.array[pos++] = r
-              geometry.attributes.color.array[pos++] = g
-              geometry.attributes.color.array[pos++] = b
-            })
-            geometry.attributes.color.needsUpdate = true
-          }
-        )
+        this.vertexGeometriesIndices.forEach((verticesIndex, cellIndex) => {
+          const geometry = this.edgeGeometries[cellIndex]
+          let pos = 0
+          verticesIndex.forEach(verticeIndex => {
+            const [r, g, b] = colorGetter({
+              cell: cellIndex,
+              face: null,
+              vertice: verticeIndex,
+              type: 'edge',
+            }).toArray()
+            geometry.attributes.color.array[pos++] = r
+            geometry.attributes.color.array[pos++] = g
+            geometry.attributes.color.array[pos++] = b
+          })
+          geometry.attributes.color.needsUpdate = true
+        })
       }
       if (this.usePoints) {
-        this.dedupVertexGeometriesIndices.forEach(
-          (verticesIndex, cellIndex) => {
-            const geometry = this.pointsGeometries[cellIndex]
-            let pos = 0
-            verticesIndex.forEach(verticeIndex => {
-              const [r, g, b] = colorGetter({
-                cell: cellIndex,
-                face: null,
-                vertice: verticeIndex,
-                type: 'point',
-              }).toArray()
-              geometry.attributes.color.array[pos++] = r
-              geometry.attributes.color.array[pos++] = g
-              geometry.attributes.color.array[pos++] = b
-            })
-            geometry.attributes.color.needsUpdate = true
-          }
-        )
+        this.vertexGeometriesIndices.forEach((verticesIndex, cellIndex) => {
+          const geometry = this.pointGeometries[cellIndex]
+          let pos = 0
+          verticesIndex.forEach(verticeIndex => {
+            const [r, g, b] = colorGetter({
+              cell: cellIndex,
+              face: null,
+              vertice: verticeIndex,
+              type: 'point',
+            }).toArray()
+            geometry.attributes.color.array[pos++] = r
+            geometry.attributes.color.array[pos++] = g
+            geometry.attributes.color.array[pos++] = b
+          })
+          geometry.attributes.color.needsUpdate = true
+        })
       }
     }
 
@@ -180,7 +194,7 @@ export default class HyperGeometry {
       this.hyperRenderer.project.bind(this.hyperRenderer)
     )
     if (this.useFaces) {
-      this.vertexGeometriesIndices.map((vertexIndices, i) => {
+      this.facesVertexGeometriesIndices.map((vertexIndices, i) => {
         const geometry = this.geometries[i]
 
         for (let i = 0, n = vertexIndices.length; i < n; i++) {
@@ -197,8 +211,8 @@ export default class HyperGeometry {
     }
 
     if (this.useEdges) {
-      this.dedupVertexGeometriesIndices.map((vertexIndices, i) => {
-        const geometry = this.edgesGeometries[i]
+      this.vertexGeometriesIndices.map((vertexIndices, i) => {
+        const geometry = this.edgeGeometries[i]
         for (let i = 0, n = vertexIndices.length; i < n; i++) {
           const [x, y, z] = vertices[vertexIndices[i]]
           geometry.attributes.position.array[i * 3] = x
@@ -211,8 +225,8 @@ export default class HyperGeometry {
     }
 
     if (this.usePoints) {
-      this.dedupVertexGeometriesIndices.map((vertexIndices, i) => {
-        const geometry = this.pointsGeometries[i]
+      this.vertexGeometriesIndices.map((vertexIndices, i) => {
+        const geometry = this.pointGeometries[i]
         for (let i = 0, n = vertexIndices.length; i < n; i++) {
           const [x, y, z] = vertices[vertexIndices[i]]
           geometry.attributes.position.array[i * 3] = x

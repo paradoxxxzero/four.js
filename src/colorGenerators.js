@@ -1,5 +1,13 @@
 import { Color } from 'three'
 
+export const uniformColors =
+  ({ colors }) =>
+  ({ type }) =>
+    colors[
+      (type.startsWith('face') ? 0 : type.startsWith('edge') ? 1 : 2) %
+        colors.length
+    ]
+
 export const cellColors =
   ({ colors }) =>
   ({ cell }) =>

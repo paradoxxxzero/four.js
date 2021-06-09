@@ -29,16 +29,16 @@ import {
   HyperMesh,
   HyperGeometry,
   HyperRenderer,
-  HyperGeometryMergedVertices,
-  HyperEdgesGeometryMergedEdges,
   HyperSliceGeometry,
+  normalizeShape,
   faceColors,
   cellColors,
   wDepthColors,
   depthColors,
 } from 'four-js'
 
-import { tesseract as shape } from '../src/shapes'
+import { permutahedronH as rawShape } from '../src/shapes'
+const shape = normalizeShape(rawShape)
 // import { default as shape } from '../src/shapes/uvw-hypersurfaces'
 // import { generateUVSurface } from '../src/shapes/uv-surfaces'
 // const shape = generateUVSurface(
@@ -56,13 +56,13 @@ const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
-const scale = 0.8
-const showFaces = !true
+const scale = 1
+const showFaces = true
 const showEdges = !true
 const showPoints = !true
-const showSliceFaces = true
-const showSliceEdges = true
-const showSlicePoints = true
+const showSliceFaces = !true
+const showSliceEdges = !true
+const showSlicePoints = !true
 const stats = new Stats()
 const scene = new Scene()
 const cellSize = 100
@@ -73,6 +73,7 @@ document.body.appendChild(renderer.domElement)
 document.body.appendChild(stats.dom)
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
+  camera.zoom = Math.min(1, window.innerWidth / window.innerHeight)
   camera.updateProjectionMatrix()
 
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -81,14 +82,16 @@ window.addEventListener('resize', () => {
 const camera = new PerspectiveCamera(
   40,
   window.innerWidth / window.innerHeight,
-  1,
-  100
+  0.5,
+  10
 )
-camera.position.set(0, 0, 10)
+camera.position.set(0, 0, 3.5)
+camera.zoom = Math.min(1, window.innerWidth / window.innerHeight)
+camera.updateProjectionMatrix()
 scene.add(camera)
 
 const controls = new OrbitControls(camera, renderer.domElement)
-controls.minDistance = 2
+controls.minDistance = 0.1
 controls.maxDistance = 50
 // Lights setup
 scene.add(new AmbientLight(0x222222))
@@ -99,10 +102,10 @@ const lotsofcolors = new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360},
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
 const material = new MeshPhongMaterial()
-material.transparent = true
-material.opacity = 0.25
-material.blending = NormalBlending
-material.depthWrite = false
+// material.transparent = true
+// material.opacity = 0.5
+// material.blending = NormalBlending
+// material.depthWrite = false
 
 material.side = DoubleSide
 material.vertexColors = true
@@ -110,7 +113,7 @@ material.vertexColors = true
 const edgesMaterial = new LineBasicMaterial()
 // edgesMaterial.opacity = 0.1
 // edgesMaterial.transparent = true
-// edgesMaterial.depthWrite = false
+edgesMaterial.depthWrite = false
 // edgesMaterial.blending = AdditiveBlending
 edgesMaterial.linewidth = 2
 edgesMaterial.vertexColors = true
@@ -163,6 +166,7 @@ const hyperGeometry = new HyperGeometry(shape, hyperRenderer, {
     0xffffff,
   ],
   colorGenerator: depthColors,
+  flatNormals: !false,
 })
 
 const hyperMesh = new HyperMesh(hyperGeometry.geometries, material)
@@ -172,7 +176,7 @@ hyperMesh.visible = showFaces
 scene.add(hyperMesh)
 
 const hyperEdges = new HyperMesh(
-  hyperGeometry.edgesGeometries,
+  hyperGeometry.edgeGeometries,
   edgesMaterial,
   LineSegments
 )
@@ -182,7 +186,7 @@ hyperEdges.visible = showEdges
 scene.add(hyperEdges)
 
 const hyperPoints = new HyperMesh(
-  hyperGeometry.pointsGeometries,
+  hyperGeometry.pointGeometries,
   pointsMaterial,
   Points
 )
