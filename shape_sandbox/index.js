@@ -29,11 +29,13 @@ import {
   HyperMesh,
   HyperGeometry,
   HyperRenderer,
-  HyperEdgesGeometry,
   HyperGeometryMergedVertices,
   HyperEdgesGeometryMergedEdges,
   HyperSliceGeometry,
-  HyperPointsGeometry,
+  faceColors,
+  cellColors,
+  wDepthColors,
+  depthColors,
 } from 'four-js'
 
 import { tesseract as shape } from '../src/shapes'
@@ -54,13 +56,13 @@ const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
-const scale = 1
+const scale = 0.8
 const showFaces = !true
 const showEdges = !true
 const showPoints = !true
 const showSliceFaces = true
 const showSliceEdges = true
-const showSlicePoints = !true
+const showSlicePoints = true
 const stats = new Stats()
 const scene = new Scene()
 const cellSize = 100
@@ -97,10 +99,11 @@ const lotsofcolors = new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360},
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
 const material = new MeshPhongMaterial()
-// material.transparent = !false
-// material.opacity = 0.75
-// material.blending = CustomBlending
-// material.depthWrite = false
+material.transparent = true
+material.opacity = 0.25
+material.blending = NormalBlending
+material.depthWrite = false
+
 material.side = DoubleSide
 material.vertexColors = true
 
@@ -110,8 +113,8 @@ const edgesMaterial = new LineBasicMaterial()
 // edgesMaterial.depthWrite = false
 // edgesMaterial.blending = AdditiveBlending
 edgesMaterial.linewidth = 2
-edgesMaterial.vertexColors = false
-edgesMaterial.color = new Color(0xffffff)
+edgesMaterial.vertexColors = true
+// edgesMaterial.color = new Color(0xffffff)
 
 const pointsMaterial = new ShaderMaterial({
   uniforms: {
@@ -149,9 +152,17 @@ const hyperGeometry = new HyperGeometry(shape, hyperRenderer, {
   useFaces: true,
   useEdges: true,
   usePoints: true,
-  useFaceColors: true,
-  useDepthEdgeColors: true,
-  colors: lotsofcolors,
+  colors: [
+    0xff0000,
+    0x0000ff,
+    0x00ff00,
+    0xff00ff,
+    0xffff00,
+    0x00ffff,
+    0x000000,
+    0xffffff,
+  ],
+  colorGenerator: depthColors,
 })
 
 const hyperMesh = new HyperMesh(hyperGeometry.geometries, material)

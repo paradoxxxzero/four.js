@@ -1,4 +1,5 @@
 import { BufferAttribute, BufferGeometry, DynamicDrawUsage, Color } from 'three'
+import { cellColors } from './colorGenerators'
 
 export default class HyperSliceGeometry {
   constructor(
@@ -6,12 +7,13 @@ export default class HyperSliceGeometry {
     hyperRenderer,
     {
       useColors = false,
+      colorGenerator = cellColors,
       useFaces = true,
       useEdges = false,
       usePoints = false,
-      colors = [
-        new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360}, 60%, 60%)`),
-      ],
+      colors = new Array(128)
+        .fill()
+        .map((_, i) => `hsl(${(i * 29) % 360}, 60%, 60%)`),
     } = {}
   ) {
     this.shape = shape
@@ -21,7 +23,8 @@ export default class HyperSliceGeometry {
     this.useFaces = useFaces
     this.useEdges = useEdges
     this.usePoints = usePoints
-    this.colors = colors
+    this.colors = colors.map(color => new Color(color))
+    this.colorGenerator = colorGenerator
 
     const maxPositions = 2 * cells.reduce((rv, c) => rv + c.length, 0)
 
@@ -64,9 +67,12 @@ export default class HyperSliceGeometry {
     const indices = []
     const edgeIndices = []
     cells.forEach((cell, cellIndex) => {
-      const [r, g, b] = this.useColors
-        ? new Color(this.colors[cellIndex % this.colors.length]).toArray()
-        : [null, null, null]
+      const colorGetter = this.useColors
+        ? this.colorGenerator({
+            shape: this.shape,
+            colors: this.colors,
+          })
+        : null
 
       const pairs = []
       cell
@@ -118,9 +124,15 @@ export default class HyperSliceGeometry {
           })
         }
 
-        linkedPairs.forEach(([x, y, z]) => {
+        linkedPairs.forEach(([x, y, z], pairIndex) => {
           if (this.useFaces) {
             if (this.useColors) {
+              const [r, g, b] = colorGetter({
+                cell: cellIndex,
+                pair: pairIndex,
+                point: [x, y, z],
+                type: 'face-pair',
+              }).toArray()
               this.geometry.attributes.color.array[3 * i] = r
               this.geometry.attributes.color.array[3 * i + 1] = g
               this.geometry.attributes.color.array[3 * i + 2] = b
@@ -131,6 +143,12 @@ export default class HyperSliceGeometry {
           }
           if (this.useEdges) {
             if (this.useColors) {
+              const [r, g, b] = colorGetter({
+                cell: cellIndex,
+                pair: pairIndex,
+                point: [x, y, z],
+                type: 'edge-pair',
+              }).toArray()
               this.edgeGeometry.attributes.color.array[3 * i] = r
               this.edgeGeometry.attributes.color.array[3 * i + 1] = g
               this.edgeGeometry.attributes.color.array[3 * i + 2] = b
@@ -141,6 +159,12 @@ export default class HyperSliceGeometry {
           }
           if (this.usePoints) {
             if (this.useColors) {
+              const [r, g, b] = colorGetter({
+                cell: cellIndex,
+                pair: pairIndex,
+                point: [x, y, z],
+                type: 'vertex-pair',
+              }).toArray()
               this.pointGeometry.attributes.color.array[3 * i] = r
               this.pointGeometry.attributes.color.array[3 * i + 1] = g
               this.pointGeometry.attributes.color.array[3 * i + 2] = b
