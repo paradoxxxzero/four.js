@@ -4,29 +4,29 @@ export const uniformColors =
   ({ colors }) =>
   ({ type }) =>
     colors[
-      (type.startsWith('face') ? 0 : type.startsWith('edge') ? 1 : 2) %
+      (type.startsWith('faces') ? 0 : type.startsWith('edges') ? 1 : 2) %
         colors.length
     ]
 
 export const cellColors =
   ({ colors }) =>
   ({ cell }) =>
-    colors[cell % colors.length]
+    colors[(cell || 0) % colors.length]
 
 export const faceColors =
   ({ colors }) =>
   ({ cell, face, type }) =>
-    colors[(type === 'face' ? face : cell) % colors.length]
+    colors[((type === 'faces' ? face : cell) || 0) % colors.length]
 
 export const wDepthColors = ({ shape, colors }) => {
   const ws = shape.vertices.map(([, , , w]) => w)
   const wmin = Math.min(...ws)
   const wmax = Math.max(...ws)
-  return ({ vertice }) =>
+  return ({ vertex }) =>
     new Color().lerpColors(
       colors[0],
       colors[1],
-      (shape.vertices[vertice][3] - wmin) / (wmax - wmin)
+      (shape.vertices[vertex][3] - wmin) / (wmax - wmin)
     )
 }
 
@@ -44,8 +44,8 @@ export const depthColors = ({ shape, colors }) => {
   const wmin = Math.min(...ws)
   const wmax = Math.max(...ws)
 
-  return ({ vertice }) => {
-    const [x, y, z, w] = shape.vertices[vertice]
+  return ({ vertex }) => {
+    const [x, y, z, w] = shape.vertices[vertex]
     const xColor = new Color().lerpColors(
       colors[0],
       colors[1],

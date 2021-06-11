@@ -131,7 +131,7 @@ export default class HyperSliceGeometry {
                 cell: cellIndex,
                 pair: pairIndex,
                 point: [x, y, z],
-                type: 'face-pair',
+                type: 'faces-pair',
               }).toArray()
               this.geometry.attributes.color.array[3 * i] = r
               this.geometry.attributes.color.array[3 * i + 1] = g
@@ -147,7 +147,7 @@ export default class HyperSliceGeometry {
                 cell: cellIndex,
                 pair: pairIndex,
                 point: [x, y, z],
-                type: 'edge-pair',
+                type: 'edges-pair',
               }).toArray()
               this.edgeGeometry.attributes.color.array[3 * i] = r
               this.edgeGeometry.attributes.color.array[3 * i + 1] = g
@@ -163,7 +163,7 @@ export default class HyperSliceGeometry {
                 cell: cellIndex,
                 pair: pairIndex,
                 point: [x, y, z],
-                type: 'vertex-pair',
+                type: 'points-pair',
               }).toArray()
               this.pointGeometry.attributes.color.array[3 * i] = r
               this.pointGeometry.attributes.color.array[3 * i + 1] = g

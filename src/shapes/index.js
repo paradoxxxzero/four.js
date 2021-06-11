@@ -149,4 +149,11 @@ export {
   generateGlome,
   generateDiTorus,
   generateUVWHyperSurface,
+  // Aliases
+  pentachoron as n5cell,
+  tesseract as n8cell,
+  hexadecachoron as n16cell,
+  icositetrachoron as n24cell,
+  hecatonicosachoron as n120cell,
+  hexacosichoron as n600cell,
 }

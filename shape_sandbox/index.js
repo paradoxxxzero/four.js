@@ -21,13 +21,13 @@ import {
   DynamicDrawUsage,
   Mesh,
   MeshPhongMaterial,
+  MeshNormalMaterial,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'stats.js'
 
 import {
   HyperMesh,
-  HyperGeometry,
   HyperRenderer,
   HyperSliceGeometry,
   normalizeShape,
@@ -37,21 +37,25 @@ import {
   depthColors,
 } from 'four-js'
 
-import { permutahedronH as rawShape } from '../src/shapes'
-const shape = normalizeShape(rawShape)
+import * as shapes from '../src/shapes'
+
+const shape = normalizeShape(
+  shapes[location.search.replace(/^\?/, '')] || shapes.tesseract
+)
 // import { default as shape } from '../src/shapes/uvw-hypersurfaces'
 // import { generateUVSurface } from '../src/shapes/uv-surfaces'
-// const shape = generateUVSurface(
-//   (u, v) => [
-//     (1.5 + 0.95 * Math.cos(v)) * Math.cos(u),
-//     (1.5 + 0.95 * Math.cos(v)) * Math.sin(u),
-//     0.95 * Math.sin(v) * Math.cos(u / 2),
-//     0.95 * Math.sin(v) * Math.sin(u / 2),
-//   ],
-//   [0, 2 * Math.PI, 32, true, false],
-//   [0, 2 * Math.PI, 32, true]
+// const shape = normalizeShape(
+//   generateUVSurface(
+//     (u, v) => [
+//       (1.5 + 0.95 * Math.cos(v)) * Math.cos(u),
+//       (1.5 + 0.95 * Math.cos(v)) * Math.sin(u),
+//       0.95 * Math.sin(v) * Math.cos(u / 2),
+//       0.95 * Math.sin(v) * Math.sin(u / 2),
+//     ],
+//     [0, 2 * Math.PI, 64, true, false],
+//     [0, 2 * Math.PI, 64, true, true]
+//   )
 // )
-
 const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
@@ -101,11 +105,70 @@ camera.add(new PointLight(0xffffff, 1))
 const lotsofcolors = new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360}, 60%, 60%)`)
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
+const primaryColors = [
+  0xff0000,
+  0x0000ff,
+  0x00ff00,
+  0xff00ff,
+  0xffff00,
+  0x00ffff,
+  0x000000,
+  0xffffff,
+]
+const hyperMesh = new HyperMesh(shape, {
+  faces: {
+    enabled: true,
+    useColors: true,
+    // colorGenerator: depthColors,
+    // colors: primaryColors,
+    // reuse: 2,
+    // split: 1,
+    // splitScale: 50,
+    // material: new MeshPhongMaterial({
+    //   transparent: true,
+    //   opacity: 0.5,
+    //   blending: CustomBlending,
+    //   depthTest: false,
+    //   depthWrite: false,
+    //   side: DoubleSide,
+    //   vertexColors: true,
+    // }),
+    // material: new MeshNormalMaterial({
+    //   vertexColors: true,
+    //   side: DoubleSide,
+    //   // transparent: true,
+    //   // opacity: 0.25,
+    //   // depthWrite: false,
+    //   // blending: NormalBlending,
+    // }),
+  },
+  edges: {
+    enabled: true,
+    useColors: true,
+    // colorGenerator: depthColors,
+    // colors: primaryColors,
+    // reuse: 0,
+    // split: 1,
+    // splitScale: 50,
+  },
+  points: {
+    enabled: true,
+    useColors: true,
+    // colorGenerator: depthColors,
+    // colors: primaryColors,
+    // reuse: 2,
+    // split: 2,
+    // splitScale: 50,
+  },
+})
+
+scene.add(hyperMesh)
+
 const material = new MeshPhongMaterial()
-// material.transparent = true
-// material.opacity = 0.5
-// material.blending = NormalBlending
-// material.depthWrite = false
+material.transparent = true
+material.opacity = 0.1
+material.blending = NormalBlending
+material.depthWrite = false
 
 material.side = DoubleSide
 material.vertexColors = true
@@ -150,51 +213,6 @@ const pointsMaterial = new ShaderMaterial({
 pointsMaterial.transparent = true
 pointsMaterial.depthWrite = false
 
-const hyperGeometry = new HyperGeometry(shape, hyperRenderer, {
-  useColors: true,
-  useFaces: true,
-  useEdges: true,
-  usePoints: true,
-  colors: [
-    0xff0000,
-    0x0000ff,
-    0x00ff00,
-    0xff00ff,
-    0xffff00,
-    0x00ffff,
-    0x000000,
-    0xffffff,
-  ],
-  colorGenerator: depthColors,
-  flatNormals: !false,
-})
-
-const hyperMesh = new HyperMesh(hyperGeometry.geometries, material)
-hyperMesh.cellSize = cellSize
-hyperMesh.scale.setScalar(scale)
-hyperMesh.visible = showFaces
-scene.add(hyperMesh)
-
-const hyperEdges = new HyperMesh(
-  hyperGeometry.edgeGeometries,
-  edgesMaterial,
-  LineSegments
-)
-hyperEdges.cellSize = cellSize
-hyperEdges.scale.setScalar(scale)
-hyperEdges.visible = showEdges
-scene.add(hyperEdges)
-
-const hyperPoints = new HyperMesh(
-  hyperGeometry.pointGeometries,
-  pointsMaterial,
-  Points
-)
-hyperPoints.cellSize = cellSize
-hyperPoints.scale.setScalar(scale)
-hyperPoints.visible = showPoints
-scene.add(hyperPoints)
-
 const slices = new HyperSliceGeometry(shape, hyperRenderer, {
   useColors: true,
   useFaces: showSliceFaces,
@@ -224,10 +242,7 @@ function render() {
   requestAnimationFrame(render)
   hyperRenderer.rotate({ xy: 4, xz: 4, xw: 4, yz: 4, yw: 4, zw: 4 })
   hyperRenderer.shiftSlice(0.5, wmin, wmax)
-  ;(showFaces || showEdges || showPoints) && hyperGeometry.update()
-  showFaces && hyperMesh.update()
-  showEdges && hyperEdges.update()
-  showPoints && hyperPoints.update()
+  ;(showFaces || showEdges || showPoints) && hyperMesh.update(hyperRenderer)
   ;(showSliceFaces || showSliceEdges || showSlicePoints) && slices.update()
   renderer.render(scene, camera)
 }

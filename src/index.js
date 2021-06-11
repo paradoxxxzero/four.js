@@ -1,4 +1,3 @@
-import HyperGeometry from './HyperGeometry'
 import HyperMesh from './HyperMesh'
 import HyperRenderer from './HyperRenderer'
 import HyperSliceGeometry from './HyperSliceGeometry'
@@ -15,7 +14,6 @@ import { normalizeShape } from './helpers'
 export {
   HyperMesh,
   HyperRenderer,
-  HyperGeometry,
   HyperSliceGeometry,
   normalizeShape,
   uniformColors,
