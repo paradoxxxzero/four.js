@@ -1,6 +1,6 @@
 import HyperMesh from './HyperMesh'
 import HyperRenderer from './HyperRenderer'
-import HyperSliceGeometry from './HyperSliceGeometry'
+import HyperSlice from './HyperSlice'
 import * as shapes from './shapes'
 import {
   uniformColors,
@@ -14,7 +14,7 @@ import { normalizeShape } from './helpers'
 export {
   HyperMesh,
   HyperRenderer,
-  HyperSliceGeometry,
+  HyperSlice,
   normalizeShape,
   uniformColors,
   cellColors,

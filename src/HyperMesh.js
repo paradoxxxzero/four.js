@@ -16,6 +16,7 @@ import {
   AdditiveBlending,
 } from 'three'
 import { cellColors } from './colorGenerators'
+import { pointsVertexShader, pointsFragmentShader } from './helpers'
 
 export const defaultColors = new Array(128)
   .fill()
@@ -69,28 +70,8 @@ const defaults = {
         size: { value: 5 },
         opacity: { value: 0.25 },
       },
-      vertexShader: `uniform float size;
-        attribute vec3 color;
-        varying vec3 vColor;
-      
-        void main() {
-          vColor = color;
-          vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-        
-          gl_PointSize = size * ( 10.0 / - mvPosition.z );
-        
-          gl_Position = projectionMatrix * mvPosition;
-        }`,
-      fragmentShader: `
-        uniform float opacity;
-        varying vec3 vColor;
-      
-          void main() {
-          
-            if (length(gl_PointCoord - vec2( 0.5, 0.5 )) > 0.475) discard;
-          
-            gl_FragColor = vec4(vColor, opacity );
-          } `,
+      vertexShader: pointsVertexShader,
+      fragmentShader: pointsFragmentShader,
       transparent: true,
       blending: AdditiveBlending,
     }),
@@ -138,56 +119,52 @@ export default class HyperMesh extends Group {
     }
     ;['points', 'edges', 'faces'].map((type, order) => {
       if (this.config[type].enabled) {
-        this.parts[type] = {
-          unfoldOrder:
-            typeof this.config[type].reuse === 'string'
-              ? reuses.indexOf(this.config[type].reuse)
-              : this.config[type].reuse,
-          geometryOrder:
-            typeof this.config[type].split === 'string'
-              ? splits.indexOf(this.config[type].split)
-              : this.config[type].split,
-        }
-        if (this.parts[type].geometryOrder > this.parts[type].unfoldOrder) {
+        const unfoldOrder =
+          typeof this.config[type].reuse === 'string'
+            ? reuses.indexOf(this.config[type].reuse)
+            : this.config[type].reuse
+        const geometryOrder =
+          typeof this.config[type].split === 'string'
+            ? splits.indexOf(this.config[type].split)
+            : this.config[type].split
+        if (geometryOrder > unfoldOrder) {
           console.warn(
-            `Geometry order ${this.parts[type].geometryOrder} can’t be superior to unfold order ${this.parts[type].unfoldOrder}`
+            `Geometry order ${geometryOrder} can’t be superior to unfold order ${unfoldOrder}`
           )
-          this.parts[type].geometryOrder = this.parts[type].unfoldOrder
+          geometryOrder = unfoldOrder
         }
-        this.parts[type].verticesIndices = this.getVerticesIndices(
-          this.parts[type].unfoldOrder,
-          this.parts[type].geometryOrder
+        const verticesIndices = this.getVerticesIndices(
+          unfoldOrder,
+          geometryOrder
         )
-        this.parts[type].indices = this.getIndices(
-          this.parts[type].unfoldOrder,
-          this.parts[type].geometryOrder,
-          order + 1
-        )
-        this.parts[type].geometry = this.buildGeometry(
-          this.parts[type].verticesIndices,
+        const indices = this.getIndices(unfoldOrder, geometryOrder, order + 1)
+        const geometry = this.buildGeometry(
+          verticesIndices,
           this.config[type].useColors,
           type
         )
 
-        this.parts[type].indices &&
-          this.setIndices(this.parts[type].geometry, this.parts[type].indices)
+        indices && this.setIndices(geometry, indices)
         this[type] = this.createMesh(
-          this.parts[type].geometry,
+          geometry,
           this.config[type].material,
           meshes[type]
         )
         if (this.config[type].useColors) {
           this.setColor(
-            this.parts[type].geometry,
-            this.parts[type].verticesIndices,
-            this.parts[type].unfoldOrder,
-            this.parts[type].geometryOrder,
+            geometry,
+            verticesIndices,
+            unfoldOrder,
+            geometryOrder,
             this.config[type].colorGenerator,
             this.config[type].colors,
             type
           )
         }
-
+        this.parts[type] = {
+          geometry,
+          verticesIndices,
+        }
         this.add(this[type])
       }
     })
@@ -627,8 +604,10 @@ export default class HyperMesh extends Group {
       hyperRenderer.project.bind(hyperRenderer)
     )
     Object.entries(this.parts).forEach(([type, part]) => {
-      this.setPoint(part.geometry, part.verticesIndices, type, vertices)
-      this.recenter(this[type], this.config[type].splitScale)
+      if (this.config[type].enabled) {
+        this.setPoint(part.geometry, part.verticesIndices, type, vertices)
+        this.recenter(this[type], this.config[type].splitScale)
+      }
     })
   }
 }

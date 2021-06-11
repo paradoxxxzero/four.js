@@ -29,7 +29,7 @@ import Stats from 'stats.js'
 import {
   HyperMesh,
   HyperRenderer,
-  HyperSliceGeometry,
+  HyperSlice,
   normalizeShape,
   faceColors,
   cellColors,
@@ -61,15 +61,15 @@ const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
 const scale = 1
-const showFaces = true
+const showFaces = !true
 const showEdges = !true
 const showPoints = !true
-const showSliceFaces = !true
-const showSliceEdges = !true
-const showSlicePoints = !true
+const showSliceFaces = true
+const showSliceEdges = true
+const showSlicePoints = true
 const stats = new Stats()
 const scene = new Scene()
-const cellSize = 100
+const splitScale = 100
 const renderer = new WebGLRenderer({ antialias: true })
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -102,7 +102,6 @@ scene.add(new AmbientLight(0x222222))
 camera.add(new PointLight(0xffffff, 1))
 
 // prettier-ignore
-const lotsofcolors = new Array(128).fill().map((_, i) => `hsl(${(i * 29) % 360}, 60%, 60%)`)
 const hyperRenderer = new HyperRenderer(1.5, 5)
 
 const primaryColors = [
@@ -117,13 +116,13 @@ const primaryColors = [
 ]
 const hyperMesh = new HyperMesh(shape, {
   faces: {
-    enabled: true,
+    enabled: showFaces,
     useColors: true,
     // colorGenerator: depthColors,
     // colors: primaryColors,
     // reuse: 2,
     // split: 1,
-    // splitScale: 50,
+    splitScale,
     // material: new MeshPhongMaterial({
     //   transparent: true,
     //   opacity: 0.5,
@@ -143,107 +142,37 @@ const hyperMesh = new HyperMesh(shape, {
     // }),
   },
   edges: {
-    enabled: true,
+    enabled: showEdges,
     useColors: true,
     // colorGenerator: depthColors,
     // colors: primaryColors,
     // reuse: 0,
     // split: 1,
-    // splitScale: 50,
+    splitScale,
   },
   points: {
-    enabled: true,
+    enabled: showPoints,
     useColors: true,
     // colorGenerator: depthColors,
     // colors: primaryColors,
     // reuse: 2,
     // split: 2,
-    // splitScale: 50,
+    splitScale,
   },
 })
 
 scene.add(hyperMesh)
 
-const material = new MeshPhongMaterial()
-material.transparent = true
-material.opacity = 0.1
-material.blending = NormalBlending
-material.depthWrite = false
-
-material.side = DoubleSide
-material.vertexColors = true
-
-const edgesMaterial = new LineBasicMaterial()
-// edgesMaterial.opacity = 0.1
-// edgesMaterial.transparent = true
-edgesMaterial.depthWrite = false
-// edgesMaterial.blending = AdditiveBlending
-edgesMaterial.linewidth = 2
-edgesMaterial.vertexColors = true
-// edgesMaterial.color = new Color(0xffffff)
-
-const pointsMaterial = new ShaderMaterial({
-  uniforms: {
-    size: { value: 5 },
-    opacity: { value: 0.25 },
-  },
-  vertexShader: `uniform float size;
-    attribute vec3 color;
-    varying vec3 vColor;
-  
-    void main() {
-      vColor = color;
-      vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-    
-      gl_PointSize = size * ( 10.0 / - mvPosition.z );
-    
-      gl_Position = projectionMatrix * mvPosition;
-    }`,
-  fragmentShader: `
-    uniform float opacity;
-    varying vec3 vColor;
-  
-      void main() {
-      
-        if (length(gl_PointCoord - vec2( 0.5, 0.5 )) > 0.475) discard;
-      
-        gl_FragColor = vec4(vColor, opacity );
-      } `,
-})
-pointsMaterial.transparent = true
-pointsMaterial.depthWrite = false
-
-const slices = new HyperSliceGeometry(shape, hyperRenderer, {
-  useColors: true,
-  useFaces: showSliceFaces,
-  useEdges: showSliceEdges,
-  usePoints: showSlicePoints,
-  colors: lotsofcolors,
-})
-
-const slicesPointsMesh = new Points(slices.pointGeometry, pointsMaterial)
-slicesPointsMesh.visible = showSlicePoints
-slicesPointsMesh.scale.setScalar(scale)
-scene.add(slicesPointsMesh)
-
-const slicesEdgesMesh = new LineSegments(slices.edgeGeometry, edgesMaterial)
-slicesEdgesMesh.visible = showSliceEdges
-slicesEdgesMesh.scale.setScalar(scale)
-scene.add(slicesEdgesMesh)
-
-const slicesMesh = new Mesh(slices.geometry, material)
-slicesMesh.visible = showSliceFaces
-slicesMesh.scale.setScalar(scale)
-
-scene.add(slicesMesh)
+const slices = new HyperSlice(shape)
+scene.add(slices)
 
 function render() {
   stats.update()
   requestAnimationFrame(render)
   hyperRenderer.rotate({ xy: 4, xz: 4, xw: 4, yz: 4, yw: 4, zw: 4 })
   hyperRenderer.shiftSlice(0.5, wmin, wmax)
-  ;(showFaces || showEdges || showPoints) && hyperMesh.update(hyperRenderer)
-  ;(showSliceFaces || showSliceEdges || showSlicePoints) && slices.update()
+  hyperMesh.update(hyperRenderer)
+  slices.update(hyperRenderer)
   renderer.render(scene, camera)
 }
 
