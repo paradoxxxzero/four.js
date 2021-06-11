@@ -123,7 +123,7 @@ export default class HyperMesh extends Group {
           typeof this.config[type].reuse === 'string'
             ? reuses.indexOf(this.config[type].reuse)
             : this.config[type].reuse
-        const geometryOrder =
+        let geometryOrder =
           typeof this.config[type].split === 'string'
             ? splits.indexOf(this.config[type].split)
             : this.config[type].split

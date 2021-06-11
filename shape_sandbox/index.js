@@ -22,6 +22,7 @@ import {
   Mesh,
   MeshPhongMaterial,
   MeshNormalMaterial,
+  MeshPhysicalMaterial,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'stats.js'
@@ -60,13 +61,12 @@ const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
-const scale = 1
-const showFaces = !true
+const showFaces = true
 const showEdges = !true
 const showPoints = !true
-const showSliceFaces = true
-const showSliceEdges = true
-const showSlicePoints = true
+const showSliceFaces = !true
+const showSliceEdges = !true
+const showSlicePoints = !true
 const stats = new Stats()
 const scene = new Scene()
 const splitScale = 100
@@ -96,10 +96,12 @@ scene.add(camera)
 
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.minDistance = 0.1
-controls.maxDistance = 50
+controls.maxDistance = 9
 // Lights setup
 scene.add(new AmbientLight(0x222222))
-camera.add(new PointLight(0xffffff, 1))
+const light = new PointLight(0xffffff, 1)
+light.position.set(-1, 1, 5)
+camera.add(light)
 
 // prettier-ignore
 const hyperRenderer = new HyperRenderer(1.5, 5)
@@ -117,6 +119,120 @@ const primaryColors = [
 const hyperMesh = new HyperMesh(shape, {
   faces: {
     enabled: showFaces,
+    useColors: true,
+    // colorGenerator: depthColors,
+    // colors: primaryColors,
+    // reuse: 0,
+    // split: 1,
+    splitScale,
+    // material: new ShaderMaterial({
+    //   transparent: true,
+    //   blending: NormalBlending,
+    //   depthTest: false,
+    //   depthWrite: false,
+    //   uniforms: {
+    //     mRefractionRatio: { value: 1.02 },
+    //     mFresnelBias: { value: 0.1 },
+    //     mFresnelPower: { value: 2.0 },
+    //     mFresnelScale: { value: 1.0 },
+    //     tCube: { value: textureCube },
+    //   },
+    //   vertexShader: `
+    //   uniform float mRefractionRatio;
+    //   uniform float mFresnelBias;
+    //   uniform float mFresnelScale;
+    //   uniform float mFresnelPower;
+    //   varying vec3 vReflect;
+    //   varying vec3 vRefract[3];
+    //   varying float vReflectionFactor;
+    //   void main() {
+    //     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+    //     vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+    //     vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );
+    //     vec3 I = worldPosition.xyz - cameraPosition;
+    //     vReflect = reflect( I, worldNormal );
+    //     vRefract[0] = refract( normalize( I ), worldNormal, mRefractionRatio );
+    //     vRefract[1] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.99 );
+    //     vRefract[2] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.98 );
+    //     vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower );
+    //     gl_Position = projectionMatrix * mvPosition;
+    //   }`,
+    //   fragmentShader: `
+    //   uniform samplerCube tCube;
+    //   varying vec3 vReflect;
+    //   varying vec3 vRefract[3];
+    //   varying float vReflectionFactor;
+    //   void main() {
+    //     vec4 reflectedColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );
+    //     vec4 refractedColor = vec4( 1.0 );
+    //     refractedColor.r = textureCube( tCube, vec3( -vRefract[0].x, vRefract[0].yz ) ).r;
+    //     refractedColor.g = textureCube( tCube, vec3( -vRefract[1].x, vRefract[1].yz ) ).g;
+    //     refractedColor.b = textureCube( tCube, vec3( -vRefract[2].x, vRefract[2].yz ) ).b;
+
+    //     gl_FragColor = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );
+    //   }`,
+    // }),
+    material: new MeshPhysicalMaterial({
+      transparent: true,
+      // opacity: 1,
+      transmission: 0.8,
+      blending: CustomBlending,
+      // depthTest: false,
+      depthWrite: false,
+      side: DoubleSide,
+      premultipliedAlpha: true,
+      vertexColors: true,
+      // color: new Color(0x0000ff),
+      // shininess: 100,
+      roughness: 0.7,
+      clearcoat: 1,
+      clearcoatRoughness: 0.4,
+      // metalness: 1,
+      // reflectivity: 1,
+    }),
+    // material: new MeshNormalMaterial({
+    //   vertexColors: true,
+    //   side: DoubleSide,
+    //   // transparent: true,
+    //   // opacity: 0.25,
+    //   // depthWrite: false,
+    //   // blending: NormalBlending,
+    // }),
+  },
+  edges: {
+    enabled: showEdges,
+    useColors: true,
+    // colorGenerator: depthColors,
+    // colors: primaryColors,
+    // reuse: 0,
+    // split: 1,
+    splitScale,
+    material: new LineBasicMaterial({
+      transparent: true,
+      opacity: 0.1,
+      // blending: AdditiveBlending,
+      depthWrite: false,
+      vertexColors: true,
+      linewidth: 2,
+      // color: new Color(0x2244ff),
+    }),
+  },
+  points: {
+    enabled: showPoints,
+    useColors: true,
+    // colorGenerator: depthColors,
+    // colors: primaryColors,
+    // reuse: 2,
+    // split: 2,
+    splitScale,
+  },
+})
+
+scene.add(hyperMesh)
+
+const slices = new HyperSlice(shape, {
+  faces: {
+    enabled: showSliceFaces,
     useColors: true,
     // colorGenerator: depthColors,
     // colors: primaryColors,
@@ -142,7 +258,7 @@ const hyperMesh = new HyperMesh(shape, {
     // }),
   },
   edges: {
-    enabled: showEdges,
+    enabled: showSliceEdges,
     useColors: true,
     // colorGenerator: depthColors,
     // colors: primaryColors,
@@ -151,7 +267,7 @@ const hyperMesh = new HyperMesh(shape, {
     splitScale,
   },
   points: {
-    enabled: showPoints,
+    enabled: showSlicePoints,
     useColors: true,
     // colorGenerator: depthColors,
     // colors: primaryColors,
@@ -160,10 +276,6 @@ const hyperMesh = new HyperMesh(shape, {
     splitScale,
   },
 })
-
-scene.add(hyperMesh)
-
-const slices = new HyperSlice(shape)
 scene.add(slices)
 
 function render() {

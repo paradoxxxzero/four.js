@@ -26,6 +26,7 @@ const defaults = {
     colors: defaultColors,
     material: new MeshPhongMaterial({
       side: DoubleSide,
+      shininess: 50,
       vertexColors: true,
     }),
   },
