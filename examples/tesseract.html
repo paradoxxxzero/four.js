@@ -51,26 +51,8 @@ function init() {
   // Create an HyperRenderer which will be used to make 4d -> 3d projections
   hyperRenderer = new FOUR.HyperRenderer(1.5, 5)
 
-  // Declare an HyperGeometry (it will generate a BufferGeometry per cell)
-  const hyperGeometry = new FOUR.HyperGeometry(
-    tesseract.vertices,
-    tesseract.faces,
-    tesseract.cells,
-    hyperRenderer
-  )
-  // Create a material as usual
-  const material = new THREE.MeshLambertMaterial()
-  material.transparent = true
-  material.opacity = 0.1
-  material.blending = THREE.AdditiveBlending
-  material.side = THREE.DoubleSide
-  material.depthWrite = false
-  material.color = new THREE.Color(0x00ff99)
-
-  // And then make an HyperMesh which is actually a three.js Group of cell Mesh
-  // If you want different materials per cells, just replace material with
-  // a material array with the same length as the number of cells
-  hyperMesh = new FOUR.HyperMesh(hyperGeometry, material)
+  // Instantiate the HyperMesh
+  hyperMesh = new FOUR.HyperMesh(tesseract)
   scene.add(hyperMesh)
   window.addEventListener('resize', onWindowResize)
 }
@@ -92,7 +74,7 @@ function render() {
   // Rotate takes the rotation speed around the 6 planes:
   hyperRenderer.rotate({ xy: 0, xz: 0, xw: 5, yz: 0, yw: 10, zw: 10 })
   // Update the hyperMesh
-  hyperMesh.update()
+  hyperMesh.update(hyperRenderer)
   
   // Render the updated scene
   renderer.render(scene, camera)

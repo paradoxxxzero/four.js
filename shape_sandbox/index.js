@@ -62,7 +62,7 @@ const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
 const showFaces = true
-const showEdges = !true
+const showEdges = true
 const showPoints = !true
 const showSliceFaces = !true
 const showSliceEdges = !true
@@ -99,9 +99,18 @@ controls.minDistance = 0.1
 controls.maxDistance = 9
 // Lights setup
 scene.add(new AmbientLight(0x222222))
-const light = new PointLight(0xffffff, 1)
+let light = new PointLight(0xffffff, 1)
 light.position.set(-1, 1, 5)
 camera.add(light)
+// light = new PointLight(0xffffff, 1)
+// light.position.set(1, -2, 4)
+// camera.add(light)
+// light = new PointLight(0xffffff, 1)
+// light.position.set(-3, -1, 2)
+// camera.add(light)
+// light = new PointLight(0xffffff, 1)
+// light.position.set(4, -6, -4)
+// camera.add(light)
 
 // prettier-ignore
 const hyperRenderer = new HyperRenderer(1.5, 5)
@@ -175,7 +184,7 @@ const hyperMesh = new HyperMesh(shape, {
     material: new MeshPhysicalMaterial({
       transparent: true,
       // opacity: 1,
-      transmission: 0.8,
+      transmission: 0.9,
       blending: CustomBlending,
       // depthTest: false,
       depthWrite: false,

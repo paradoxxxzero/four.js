@@ -28,30 +28,26 @@ const { tesseract } = shapes
 
 // Create an HyperRenderer which will be used to make 4d -> 3d projections
 const hyperRenderer = new HyperRenderer(1.5, 5)
+```
 
-// Declare an HyperGeometry (it will generate a BufferGeometry per cell)
-const hyperGeometry = new HyperGeometry(
-  tesseract.vertices,
-  tesseract.faces,
-  tesseract.cells,
-  hyperRenderer
-)
-// Create a material as usual
-const material = new MeshLambertMaterial()
-material.transparent = true
-material.opacity = 0.1
-material.blending = AdditiveBlending
-material.side = DoubleSide
-material.depthWrite = false
-material.color = new Color(0x00ff99)
+#### 4D -> 3D Projection
 
-// And them make an HyperMesh which is actually a three.js Group of cell Mesh
-// If you want different materials per cells, just replace material with
-// a material array with the same length as the number of cells
-const hyperMesh = new HyperMesh(hyperGeometry, material)
+```js
+// Instantiate an HyperMesh with the shape
+const hyperMesh = new HyperMesh(shape)
 
 // (...) Setup the three.js scene as usual and add the HyperMesh:
 scene.add(hyperMesh)
+```
+
+#### 4D -> 3D Cross Section
+
+```js
+// Instantiate an HyperSlice with the shape
+const hyperSlice = new HyperSlice(shape)
+
+// (...) Setup the three.js scene as usual and add the HyperSlice:
+scene.add(hyperSlice)
 ```
 
 ### Updating
@@ -63,43 +59,134 @@ update() {
   requestAnimationFrame(update)
   // Rotate takes the rotation speed around the 6 planes:
   hyperRenderer.rotate({ xy: 0, xz: 0, xw: 5, yz: 0, yw: 10, zw: 10 })
+
+  // Move the cross section along the w-axis
+  hyperRenderer.shiftSlice(0.5, wmin, wmax)
+
   // Update the hyperMesh
-  hyperMesh.update()
+  hyperMesh.update(hyperRenderer)
+
+  // Update the hyperSlice
+  hyperSlice.update(hyperRenderer)
+
+  // Render the scene
+  renderer.render(scene, camera)
 }
 ```
 
-### Alternate rendering
+### Configuration
 
-It's possible to render only the edges of the 4d mesh with `HyperEdgeGeometry`:
-
-```js
-const hyperGeometry = new HyperEdgeGeometry(
-  tesseract.vertices,
-  tesseract.faces,
-  tesseract.cells,
-  hyperRenderer
-)
-const material = new LineBasicMaterial()
-// (...)
-
-// HyperMesh here will contain an array of LineSegments instead of Mesh
-const hyperEdges = new HyperMesh(hyperGeometry, material, LineSegments)
-```
-
-or only the vertices with `HyperPointsGeometry`:
+`HyperMesh` and `HyperSlice` accept a configuration object as second argument:
 
 ```js
-const hyperGeometry = new HyperPointsGeometry(
-  tesseract.vertices,
-  tesseract.faces,
-  tesseract.cells,
-  hyperRenderer
-)
-const material = new PointsMaterial()
-// (...)
+const meshConfig = {
+  faces: {
+    // Configuration regarding faces
+    enabled: true, // Render faces
+    useColors: true, // Use vertex coloring through colorGenerator
+    colorGenerator: cellColors, // Called with ({shape, colors}) must return a function that returns a colors from ({cell, face, vertex, type}) indexes
+    colors: defaultColors, // Colors to chose from
+    reuse: 'none', // One of ['all', 'faces', 'none'], specifies whether to duplicate vertex in faces / cells. Useful for polychora due to needing a normal per face per vertex.
+    split: 'cells', // One of ['none', 'cells', 'faces'], specifies whether to render one Mesh, one Mesh per cell, one Mesh pes face
+    splitScale: 100, // Scale of each split, allow for better comprehension of 4D Mesh when used with split: 'cells'
+    material: new MeshPhongMaterial({
+      // The material (or list of materials per split) to use when rendering
+      transparent: true,
+      opacity: 0.25,
+      blending: NormalBlending,
+      depthWrite: false,
+      side: DoubleSide,
+      vertexColors: true,
+    }),
+  },
+  edges: {
+    // Render edges
+    enabled: true,
+    useColors: true,
+    colorGenerator: cellColors,
+    colors: defaultColors,
+    reuse: 'faces',
+    split: 'cells',
+    splitScale: 100,
+    material: new LineBasicMaterial({
+      transparent: true,
+      opacity: 0.25,
+      blending: AdditiveBlending,
+      depthWrite: false,
+      vertexColors: true,
+      linewidth: 2,
+    }),
+  },
+  points: {
+    // Render points
+    enabled: false,
+    useColors: true,
+    colorGenerator: cellColors,
+    colors: defaultColors,
+    reuse: 'faces',
+    split: 'none',
+    splitScale: 100,
+    material: new ShaderMaterial({
+      uniforms: {
+        size: { value: 5 },
+        opacity: { value: 0.25 },
+      },
+      vertexShader: pointsVertexShader,
+      fragmentShader: pointsFragmentShader,
+      transparent: true,
+      blending: AdditiveBlending,
+    }),
+  },
+}
 
-// HyperMesh here will contain an array of Points instead of Mesh
-const hyperEdges = new HyperMesh(hyperGeometry, material, Points)
+const hyperMesh = new HyperMesh(shape, meshConfig)
+
+// Same configuration (minus split/reuse configs) for HyperSlice:
+const sliceConfig = {
+  faces: {
+    enabled: true,
+    useColors: true,
+    colorGenerator: cellColors,
+    colors: defaultColors,
+    material: new MeshPhongMaterial({
+      side: DoubleSide,
+      shininess: 50,
+      vertexColors: true,
+    }),
+  },
+  edges: {
+    enabled: true,
+    useColors: true,
+    colorGenerator: cellColors,
+    colors: defaultColors,
+    material: new LineBasicMaterial({
+      transparent: true,
+      opacity: 0.25,
+      blending: AdditiveBlending,
+      depthWrite: false,
+      vertexColors: true,
+      linewidth: 2,
+    }),
+  },
+  points: {
+    enabled: false,
+    useColors: true,
+    colorGenerator: cellColors,
+    colors: defaultColors,
+    material: new ShaderMaterial({
+      uniforms: {
+        size: { value: 5 },
+        opacity: { value: 0.25 },
+      },
+      vertexShader: pointsVertexShader,
+      fragmentShader: pointsFragmentShader,
+      transparent: true,
+      blending: AdditiveBlending,
+    }),
+  },
+}
+
+const hyperSlice = new HyperSlice(shape, sliceConfig)
 ```
 
 ## Shape definition
@@ -210,4 +297,4 @@ Feel free to make pull requests with your own creations!
 
 ### @FranzPoize
 
-For his nice 3-sphere shape.
+For his nice 3-sphere shape which has since been refactored and generalized into `uvw-hypersurfaces`.

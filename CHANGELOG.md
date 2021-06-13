@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+# [2.0.0] - 2021-06-13
+
+### Breaking Changes
+
+- API complete overhaul, all hyper geometries has been merged into `HyperMesh` see [README.md] for more information.
+
+### Added
+
+- `HyperSlice` to visualize shapes with 3-plane cross sections.
+- `normalizeShape` helper to constraint shape in [-1, 1] size.
+- `colorGenerator` module with some default generators for use with material vertexColors.
+
+### Removed
+
+- `HyperGeometry`, `HyperEdgesGeometry`, `HyperPointsGeometry`, `HyperGeometryMergedVertices` and `HyperEdgesGeometryMergedEdges` (merged into `HyperMesh`)
+
 ## [1.1.0] - 2021-06-01
 
 ## Breaking Changes
@@ -130,7 +146,8 @@
 
 - All rendering components: `HyperMesh`, `HyperRenderer`, `HyperGeometry` `HyperEdgeGeometry`, `HyperPointsGeometry` and 3 shapes: `tesseract`, `pentachoron`, `hexadecachoron`.
 
-[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/paradoxxxzero/four.js/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/paradoxxxzero/four.js/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/paradoxxxzero/four.js/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/paradoxxxzero/four.js/compare/v1.0.1...v1.0.2
