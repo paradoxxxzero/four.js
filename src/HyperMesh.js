@@ -600,6 +600,7 @@ export default class HyperMesh extends Group {
   }
 
   update(hyperRenderer) {
+    hyperRenderer.prepare(this.shape.vertices)
     const vertices = this.shape.vertices.map(
       hyperRenderer.project.bind(hyperRenderer)
     )

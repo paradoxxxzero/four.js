@@ -30,6 +30,7 @@ import Stats from 'stats.js'
 import {
   HyperMesh,
   HyperRenderer,
+  HyperRendererCached,
   HyperSlice,
   normalizeShape,
   faceColors,
@@ -61,11 +62,11 @@ const ws = shape.vertices.map(([, , , w]) => w)
 const wmin = Math.min(...ws)
 const wmax = Math.max(...ws)
 
-const showFaces = true
-const showEdges = true
+const showFaces = !true
+const showEdges = !true
 const showPoints = !true
-const showSliceFaces = !true
-const showSliceEdges = !true
+const showSliceFaces = true
+const showSliceEdges = true
 const showSlicePoints = !true
 const stats = new Stats()
 const scene = new Scene()
@@ -113,7 +114,7 @@ camera.add(light)
 // camera.add(light)
 
 // prettier-ignore
-const hyperRenderer = new HyperRenderer(1.5, 5)
+const hyperRenderer = new HyperRendererCached(1.5, 5)
 
 const primaryColors = [
   0xff0000,
@@ -290,7 +291,7 @@ scene.add(slices)
 function render() {
   stats.update()
   requestAnimationFrame(render)
-  hyperRenderer.rotate({ xy: 4, xz: 4, xw: 4, yz: 4, yw: 4, zw: 4 })
+  // hyperRenderer.rotate({ xy: 4, xz: 4, xw: 4, yz: 4, yw: 4, zw: 4 })
   hyperRenderer.shiftSlice(0.5, wmin, wmax)
   hyperMesh.update(hyperRenderer)
   slices.update(hyperRenderer)

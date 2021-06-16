@@ -140,6 +140,7 @@ export default class HyperSlice extends Group {
   }
 
   update(hyperRenderer) {
+    hyperRenderer.prepare(this.shape.vertices)
     const { vertices, faces, cells } = this.shape
     const epsilon = 1e-8
     let i = 0
@@ -160,11 +161,17 @@ export default class HyperSlice extends Group {
         .map(faceIndex => faces[faceIndex])
         .forEach(face => {
           const pair = face
-            .map((verticeIndex, faceVerticeIndex) => [
-              vertices[verticeIndex],
-              vertices[face[(faceVerticeIndex + 1) % face.length]],
-            ])
-            .map(([p1, p2]) => hyperRenderer.slice(p1, p2))
+            .map((verticeIndex, faceVerticeIndex) => {
+              const nextVerticeIndex =
+                face[(faceVerticeIndex + 1) % face.length]
+              return [
+                vertices[verticeIndex],
+                vertices[nextVerticeIndex],
+                verticeIndex,
+                nextVerticeIndex,
+              ]
+            })
+            .map(args => hyperRenderer.slice(...args))
             .filter(x => x)
           pair.length > 1 && pairs.push(pair)
         })
@@ -188,7 +195,6 @@ export default class HyperSlice extends Group {
             }
           }
           if (lp === pairs.length) {
-            // console.log(lp, cell)
             return
           }
         }

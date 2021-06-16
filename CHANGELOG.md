@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [2.0.1] - 2021-06-16
+
+## Added
+
+- `HyperRendererCached` which is a rotation cached version of `HyperRenderer` a noticeable optimization for `HyperSlice`.
+
+## Fixed
+
+- Crashes in colorGenerator when there's only one color and with depth on slice.
+
 # [2.0.0] - 2021-06-13
 
 ### Breaking Changes
@@ -20,12 +30,12 @@
 
 ## [1.1.0] - 2021-06-01
 
-## Breaking Changes
+### Breaking Changes
 
 - Renamed `HyperEdgeGeometry` to `HyperEdgesGeometry`
 - Changed signature of `HyperEdgesGeometry` and `HyperPointsGeometry` to accept an `HyperGeometry` instead of shape `vertices`, `faces`, `cells` to avoid multiple projections. The `HyperGeometry` must now be updated even if not rendered.
 
-## Added
+### Added
 
 - `HyperGeometryMergedVertices` which further reuse vertices at the expense of having one normal by vertex.
 
@@ -33,7 +43,7 @@
 
 ## [1.0.3] - 2021-05-31
 
-## Added
+### Added
 
 - Add remaining sage shapes:
   - `hecatonicosachoronRectified`
@@ -49,7 +59,7 @@
 
 ## [1.0.2] - 2021-05-23
 
-## Added
+### Added
 
 - `uLoop`, `vLoop` parameters for `generateUVSurface` to control if the surface should close on itself
 - `uLoop`, `vLoop`, `wLoop` parameters for `generateUVWHyperSurface` to control if the hypersurface should close on itself
@@ -69,7 +79,7 @@
   - `threetorus` -> `diTorus`
   - `flattorus` -> `flatTorus`
 
-## Added
+### Added
 
 - Add generators for simple polytopes to generate custom sizes: `generateTesseract`, `generateHyperCuboid`, `generateCuboidPyramid`, `generateCubicPyramid`, `generateGlome`, `generateDiTorus`, `generateFlatTorus`,`generateDuoCylinder`
 - Add uv surface generator and uvw hypersurface generator: `generateUVSurface`, `generateUVWHyperSurface`
