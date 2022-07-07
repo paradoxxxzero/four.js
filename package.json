@@ -1,6 +1,6 @@
 {
   "name": "four-js",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Render 4 dimensional objects with three.js",
   "main": "build/four.js",
   "module": "build/four.module.js",
@@ -23,10 +23,10 @@
     "three": "^0.X.X"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.0.0",
-    "prettier": "^2.3.1",
-    "rollup": "^2.51.2",
-    "servez": "^1.11.0",
-    "three": "^0.129.0"
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "prettier": "^2.7.1",
+    "rollup": "^2.75.7",
+    "servez": "^1.14.1",
+    "three": "^0.142.0"
   }
 }
