@@ -31,9 +31,38 @@ export default [
     plugins: [resolve()],
   },
   {
+    input: 'src/index-full.js',
+    output: {
+      file: 'build/four.full.js',
+      format: 'cjs',
+    },
+    external: id => !(id.startsWith('.') || id.startsWith(path.resolve('.'))),
+    plugins: [resolve()],
+  },
+  {
+    input: 'src/index-full.js',
+    output: {
+      file: 'build/four.full.module.js',
+      format: 'esm',
+    },
+    external: id => !(id.startsWith('.') || id.startsWith(path.resolve('.'))),
+    plugins: [resolve()],
+  },
+  {
     input: 'src/index.js',
     output: {
       file: 'build/four.local.module.js',
+      format: 'esm',
+    },
+    external: id =>
+      id === '../node_modules/three/build/three.module.js' ||
+      !(id.startsWith('.') || id.startsWith(path.resolve('.'))),
+    plugins: [local(), resolve()],
+  },
+  {
+    input: 'src/index-full.js',
+    output: {
+      file: 'build/four.full.local.module.js',
       format: 'esm',
     },
     external: id =>

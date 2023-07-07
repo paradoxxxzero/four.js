@@ -1,7 +1,7 @@
 import {
   BufferAttribute,
   BufferGeometry,
-  DynamicDrawUsage,
+  StreamDrawUsage,
   Color,
   Group,
   MeshPhongMaterial,
@@ -523,14 +523,14 @@ export default class HyperMesh extends Group {
     geometry.setAttribute(
       'position',
       new BufferAttribute(new Float32Array(3 * size), 3).setUsage(
-        DynamicDrawUsage
+        StreamDrawUsage
       )
     )
     if (useColors) {
       geometry.setAttribute(
         'color',
         new BufferAttribute(new Float32Array(3 * size), 3).setUsage(
-          DynamicDrawUsage
+          StreamDrawUsage
         )
       )
     }

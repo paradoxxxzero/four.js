@@ -2,7 +2,6 @@ import HyperMesh from './HyperMesh'
 import HyperRenderer from './HyperRenderer'
 import HyperRendererCached from './HyperRendererCached'
 import HyperSlice from './HyperSlice'
-import * as shapes from './shapes'
 import {
   uniformColors,
   cellColors,
@@ -11,6 +10,48 @@ import {
   depthColors,
 } from './colorGenerators'
 import { normalizeShape } from './helpers'
+import {
+  cuboidPyramid,
+  generateCubicPyramid,
+  generateCuboidPyramid,
+  cuboidBiPyramid,
+  generateCubicBiPyramid,
+  generateCuboidBiPyramid,
+  hexadecachoron,
+  icositetrachoron,
+  octahedraloidPyramid,
+  generateOctahedralPyramid,
+  generateOctahedraloidPyramid,
+  octahedraloidBiPyramid,
+  generateOctahedralBiPyramid,
+  generateOctahedraloidBiPyramid,
+  pentachoron,
+  tesseract,
+  hyperCuboid,
+  generateTesseract,
+  generateHyperCuboid,
+} from './shapes'
+
+const shapes = {
+  cuboidPyramid,
+  generateCubicPyramid,
+  generateCuboidPyramid,
+  cuboidBiPyramid,
+  generateCubicBiPyramid,
+  generateCuboidBiPyramid,
+  hexadecachoron,pentachoron,icositetrachoron,
+  octahedraloidPyramid,
+  generateOctahedralPyramid,
+  generateOctahedraloidPyramid,
+  octahedraloidBiPyramid,
+  generateOctahedralBiPyramid,
+  generateOctahedraloidBiPyramid,
+  pentachoron,
+  tesseract,
+  hyperCuboid,
+  generateTesseract,
+  generateHyperCuboid,
+}
 
 export {
   HyperMesh,
@@ -23,5 +64,5 @@ export {
   faceColors,
   wDepthColors,
   depthColors,
-  shapes,
+  shapes
 }

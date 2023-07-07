@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.1.0] - 2022-07-07
+
+### Changed
+
+- Use `StreamDrawUsage` instead of `DynamicDrawUsage` to increase performance.
+- Update dependencies
+
 ## [2.0.1] - 2021-06-16
 
 ## Added
@@ -156,7 +163,8 @@
 
 - All rendering components: `HyperMesh`, `HyperRenderer`, `HyperGeometry` `HyperEdgeGeometry`, `HyperPointsGeometry` and 3 shapes: `tesseract`, `pentachoron`, `hexadecachoron`.
 
-[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v2.0.1...HEAD
+[unreleased]: https://github.com/paradoxxxzero/four.js/compare/v2.1.0...HEAD
+[2.0.1]: https://github.com/paradoxxxzero/four.js/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/paradoxxxzero/four.js/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/paradoxxxzero/four.js/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/paradoxxxzero/four.js/compare/v1.0.3...v1.1.0

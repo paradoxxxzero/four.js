@@ -23,10 +23,10 @@
     "three": "^0.X.X"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "prettier": "^2.7.1",
-    "rollup": "^2.75.7",
-    "servez": "^1.14.1",
-    "three": "^0.142.0"
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "prettier": "^3.0.0",
+    "rollup": "^3.26.2",
+    "servez": "^2.0.0",
+    "three": "^0.154.0"
   }
 }
